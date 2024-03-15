@@ -2,9 +2,10 @@
 	program = gpg
 [commit]
 	gpgsign = false
-[user]
-	name = "pkonkol"
-	email = "31186361+pkonkol@users.noreply.github.com"
+[includeIf "gitdir:~/projects/personal/"]
+	path = .gitconfig-personal
+[includeIf "gitdir:~/projects/professional/"]
+	path = .gitconfig-professional
 [alias]
 	lg = log --all --graph --decorate --oneline
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
@@ -14,6 +15,15 @@
 	lolg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-files
 	g = grep --break --heading --line-number
+	a = add
+	ap = add -p
+	ci = commit
+	cia = commit --amend
+	co = checkout
+	s = status
+	b = branch
+	p = pull --rebase
+	pu = push
 [color]
 	ui=auto
 [color "branch"]

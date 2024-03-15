@@ -5,8 +5,10 @@ zoxide init fish | source
 
 fish_vi_key_bindings
 
+alias e=nvim
+alias g=git
 alias vim=nvim
-alias ls=exa
+alias ls='eza --icons'
 alias bat=batcat
 
 if status is-interactive
