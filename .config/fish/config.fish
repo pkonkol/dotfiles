@@ -1,14 +1,16 @@
 fenv source ~/.profile
+atuin init fish | source
+starship init fish | source
+zoxide init fish | source
+
 fish_vi_key_bindings
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-end
 
 alias vim=nvim
 alias ls=exa
 alias bat=batcat
 
-starship init fish | source
-zoxide init fish | source
-atuin init fish | source
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+
 
