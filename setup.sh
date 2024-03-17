@@ -24,8 +24,7 @@ main() {
         cargo install ytop bandwhich du-dust procs skim
     fi
     if [[ $DEPLOY_DOTFILES -eq 1 ]]; then
-        git clone https://github.com/pkonkol/dotfiles.git
-        # TODO
+	./copy.sh
     fi
     if [[ $SETUP_UFW -eq 1 ]]; then
         sudo ufw default deny incoming
