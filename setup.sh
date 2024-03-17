@@ -3,7 +3,7 @@ main() {
     parse $@
 
     if [[ $INSTALL_APT -eq 1 ]]; then
-        sudo apt install -y build-essential whois neovim syncthing tmux ranger fish tldr nmap masscan python-is-python3 bat ripgrep fd-find zoxide grc sd translate-shell
+        sudo apt install -y build-essential whois neovim syncthing tmux ranger fish tldr nmap masscan python-is-python3 bat ripgrep fd-find zoxide grc translate-shell
     fi
     if [[ $INSTALL_DOWNLOADABLE -eq 1 ]]; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -15,12 +15,12 @@ main() {
         tldr -u
         fish -c 'omf install grc bass foreign-env'
     fi
-    if [[ $CARGO_BUILD_BASIC -eq 1 ]]; then
-        source "$HOME/.cargo/.env"
+    if [[ $CARGO_BUILD_ESSENTIAL -eq 1 ]]; then
+        source "$HOME/.cargo/env"
         cargo install eza atuin git-delta cargo-cache
     fi
     if [[ $CARGO_BUILD_ADDITIONAL -eq 1 ]]; then
-        source "$HOME/.cargo/.env"
+        source "$HOME/.cargo/env"
         cargo install ytop bandwhich du-dust procs skim
     fi
     if [[ $DEPLOY_DOTFILES -eq 1 ]]; then
@@ -53,12 +53,10 @@ usage() {
 }
 
 parse() {
-    echo huj
     if [[ $# -eq 0 ]]; then
         usage; exit
     fi
     while getopts "aidfcuwy" opt; do
-        echo "h3"
         case ${opt} in
             a ) INSTALL_APT=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; CARGO_BUILD_ESSENTIAL=1; CARGO_BUILD_ADDITIONAL=1; SETUP_UFW=1;DEPLOY_DOTFILES=1 ;;
             i ) INSTALL_APT=1 && echo "h2" ;;
