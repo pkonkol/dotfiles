@@ -1,7 +1,8 @@
 [include]
     path = ~/.config/delta/themes.gitconfig
-[includeIf "gitdir:~/projects/"]
-	path = ~/.gitconfig-personal
+[user]
+	name = "pkonkol"
+	email = "31186361+pkonkol@users.noreply.github.com"
 [includeIf "gitdir:~/work/"]
 	path = ~/.gitconfig-work
 [alias]
