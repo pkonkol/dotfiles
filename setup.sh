@@ -3,7 +3,7 @@ main() {
     parse $@
 
     if [[ $INSTALL_APT -eq 1 ]]; then
-        sudo apt install -y build-essential whois neovim syncthing tmux ranger fish tldr nmap masscan python-is-python3 bat ripgrep fd-find zoxide grc translate-shell
+        sudo apt install -y build-essential whois neovim syncthing tmux ranger fish tldr nmap masscan python-is-python3 bat ripgrep fd-find zoxide grc translate-shell fzf shellcheck
     fi
     if [[ $INSTALL_DOWNLOADABLE -eq 1 ]]; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
