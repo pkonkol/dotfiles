@@ -6,6 +6,9 @@ main() {
         sudo apt install -y build-essential whois neovim syncthing tmux ranger fish tldr nmap masscan python-is-python3 bat ripgrep fd-find zoxide grc translate-shell fzf shellcheck
     fi
     if [[ $INSTALL_DOWNLOADABLE -eq 1 ]]; then
+	wget "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip"
+	unzip -d ~/.local/share/fonts NerdFontsSymbolsOnly.zip
+	fc-cache -fv
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
         curl -sS https://starship.rs/install.sh | sh
