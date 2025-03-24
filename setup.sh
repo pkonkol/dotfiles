@@ -7,6 +7,7 @@ main() {
     fi
     if [[ $INSTALL_DOWNLOADABLE -eq 1 ]]; then
 	wget "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/NerdFontsSymbolsOnly.zip"
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	unzip -d ~/.local/share/fonts NerdFontsSymbolsOnly.zip
 	fc-cache -fv
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
