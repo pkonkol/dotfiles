@@ -1,0 +1,3 @@
+[submodule "submodules/srcery-tmux"]
+	path = submodules/srcery-tmux
+	url = https://github.com/pkonkol/srcery-tmux
