@@ -1,10 +1,9 @@
 [include]
     path = ~/.config/delta/themes.gitconfig
-[user]
-	name = "pkonkol"
-	email = "31186361+pkonkol@users.noreply.github.com"
-[includeIf "gitdir:~/work/"]
-	path = ~/.gitconfig-work
+[include]
+	path = ~/.gitconfig-user
+[includeIf "gitdir:~/projects/"]
+	path = ~/.gitconfig-personal
 [alias]
 	lg = log --all --graph --decorate --oneline
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
@@ -30,7 +29,7 @@
 	editor = vim
 	pager = delta
 	autocrlf = false
-	eol = crlf
+	eol = lf
 	#safecrlf = false
 [grep]
 	lineNumber = true
