@@ -1,0 +1,54 @@
+// ============================================================================
+//  dotfiles-settings.json
+//  NIE jest kopiowany automatycznie przez copy.sh — VS Code trzyma w
+//  settings.json mnostwo rzeczy per-projekt i per-rozszerzenie, wiec
+//  nadpisanie go skryptem gwarantuje utrate ustawien.
+//
+//  Dwa sposoby na wgranie:
+//    1) Recznie: Cmd+Shift+P -> "Preferences: Open User Settings (JSON)"
+//       i wklej potrzebne klucze.
+//    2) Skryptem scalajacym (robi backup):
+//       ./.config/vscode/merge-settings.sh
+// ============================================================================
+{
+  // --- TERMINAL ------------------------------------------------------------
+  // Pelny patched Nerd Font jako font GLOWNY. VS Code — w odroznieniu od
+  // WezTerma — NIE dokleja zadnego Nerd Fonta sam, wiec bez tego nie bedzie
+  // ikonek w ogole. Font "Symbols Only" jako fallback ma wlasny baseline
+  // i ikonki plywaja w pionie — dlatego pelny patch, nie fallback.
+  "terminal.integrated.fontFamily": "'IoskeleyMonoTerm Nerd Font Mono', 'JetBrainsMono Nerd Font', Menlo",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.lineHeight": 1.0,
+  "terminal.integrated.defaultProfile.osx": "fish",
+  "terminal.integrated.scrollback": 20000,
+  "terminal.integrated.cursorStyle": "block",
+  "terminal.integrated.cursorBlinking": false,
+  // Vi-mode w fishu wysyla sekwencje zmiany ksztaltu kursora — nie blokuj ich
+  "terminal.integrated.allowChords": false,
+
+  // --- EDYTOR --------------------------------------------------------------
+  "editor.fontFamily": "'IoskeleyMonoTerm Nerd Font Mono', 'JetBrainsMono Nerd Font', Menlo, monospace",
+  "editor.fontSize": 14,
+  "editor.fontLigatures": false,
+  "editor.lineHeight": 1.5,
+  "editor.renderWhitespace": "boundary",
+  "editor.rulers": [88, 120],
+  "editor.bracketPairColorization.enabled": true,
+
+  // --- PLIKI ---------------------------------------------------------------
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+
+  // --- MNIEJ SZUMU ---------------------------------------------------------
+  "workbench.startupEditor": "none",
+  "editor.minimap.enabled": false,
+  "breadcrumbs.enabled": true,
+  "telemetry.telemetryLevel": "off",
+  "update.showReleaseNotes": false,
+
+  // --- GIT -----------------------------------------------------------------
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "diffEditor.ignoreTrimWhitespace": false
+}

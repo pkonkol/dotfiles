@@ -66,7 +66,10 @@ set -g pk_trans_style rule       # rule | blank | bg | none
 #   bg    — tlo pod promptem (kolorowo, ale psuje czytelnosc — odradzam)
 #   none  — nic; zostaje tylko stopka ◀ po dlugich komendach
 set -g pk_rule_char '─'          # '━' grubsza, '╌' przerywana, '·' kropki
-set -g pk_trans_bg '#005f5f'     # uzywane tylko przy pk_trans_style = bg
+set -g pk_trans_bg brblack       # uzywane tylko przy pk_trans_style = bg
+#   Celowo nazwa z palety terminala, nie '#005f5f': kolory nazwane bierze
+#   sie z motywu terminala, wiec dzialaja tak samo w WezTerm, VS Code, tmux
+#   i przez ssh na 256-kolorowym TERM-ie. Hex wymaga truecolor.
 
 # --- git prompt (natywny, w C — nie forkuje) ---
 set -g __fish_git_prompt_showdirtystate      1
@@ -81,16 +84,21 @@ set -g __fish_git_prompt_char_upstream_behind '↓'
 
 # Ikona systemu: liczona RAZ przy starcie (jeden fork uname), nigdy w prompcie.
 #
-# JESLI IKONA JEST PRZESUNIETA W PIONIE: to metryki fontu, nie prompt.
-# Glify z roznych zakresow Nerd Fonta maja rozne baseline'y — zakres
-# Material Design Icons (󰀵) siedzi nizej niz Font Awesome (), ktorego
-# uzywa m.in. eza. Najprosciej: wymus inny glif, odkomentowujac linie nizej.
-#set -g pk_os_icon ''           # Font Awesome — zwykle rowno z ikonkami ezy
-#set -g pk_os_icon '󰀵'           # Material Design Icons — czesto 2-3px za nisko
-#set -g pk_os_icon ''           # Apple (inny wariant FA)
+# IKONA macOS = U+F8FF, czyli logo Apple z FONTU SYSTEMOWEGO, nie z Nerd Fonta.
+# Nerd Font nie obsadza tego punktu kodowego (jego zakresy to E000-F533
+# i F0001-F1AF0), wiec glif dostarcza SF Pro / Menlo — a tam logo jest
+# zaprojektowane jako zwykly znak tekstowy: dokladnie wysokosci liter
+# i na wspolnym baseline. Stad rowna wysokosc z '[I]'.
+# Minus: dziala tylko na macOS. Na Linuksie i tak uzywamy innych glifow.
+#
+# Gdyby jednak nie pasowalo, alternatywy z Nerd Fonta (odkomentuj jedna):
+#set -g pk_os_icon ''      # Font Awesome, U+F179
+#set -g pk_os_icon '󰀵'      # Material Design Icons, U+F0035
+#set -g pk_os_icon ''      # Font Logos, U+F302
+#set -g pk_show_os 0        # ...albo po prostu wylacz: hostname i tak odroznia maszyny
 if not set -q pk_os_icon
     switch (uname -s)
-        case Darwin; set -g pk_os_icon ''   # Font Awesome — rowniej z ikonkami ezy
+        case Darwin; set -g pk_os_icon ''   # logo Apple z fontu systemowego
         case Linux
             set -l id ''
             test -r /etc/os-release; and set id (string match -r '^ID=.*' < /etc/os-release | string replace 'ID=' '' | string trim -c '"')
@@ -301,6 +309,19 @@ test -d /opt/homebrew/bin; and fish_add_path /opt/homebrew/bin /opt/homebrew/sbi
 #fish_add_path /usr/local/bin                                # macOS Intel
 fish_add_path ~/.local/bin
 fish_add_path ~/.cargo/bin
+
+# WezTerm trzyma CLI WEWNATRZ bundla .app i nie linkuje go do /usr/local/bin.
+# Bez tego 'wezterm ls-fonts', 'wezterm cli' itd. nie istnieja w shellu.
+# Bundle moze lezec w kilku miejscach zaleznie od sposobu instalacji.
+for d in /Applications/WezTerm.app/Contents/MacOS \
+         ~/Applications/WezTerm.app/Contents/MacOS \
+         /Applications/WezTerm-nightly.app/Contents/MacOS
+    test -x $d/wezterm; and fish_add_path $d; and break
+end
+# Nie znalazl? Zobacz gdzie faktycznie jest:
+#   mdfind -name WezTerm.app
+#   ls -l /Applications/WezTerm.app/Contents/MacOS/
+fish_add_path ~/.docker/bin
 
 # ============================================================================
 #  INTEGRACJE — kazda to JEDEN fork przy starcie shella. Tnij bez litosci.

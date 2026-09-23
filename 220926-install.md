@@ -64,21 +64,119 @@ Trzeba podać listę jawnie w `settings.json`:
 
 Oba fonty instaluje `setup-mac.sh -b`.
 
-### Ikona przesunięta w pionie
+### Ikony przesunięte w pionie / za małe — fix fontem
 
-To metryki fontu, nie prompt. Glify z różnych zakresów Nerd Fonta mają różne
-baseline'y: zakres **Material Design Icons** (`󰀵`, U+F0035) siedzi niżej niż
-**Font Awesome** (``, U+F179), z którego korzystają m.in. ikonki `eza` —
-dlatego eza wygląda równo, a jabłko nie. Dwa wyjścia:
+Konfigiem promptu tego się nie da naprawić. Font **„Symbols Only"** użyty jako
+*fallback* dostaje własny baseline, niezależny od fontu głównego, więc glify
+pływają w pionie. Dodatkowo **WezTerm sam dokleja własny bundlowany Nerd Font
+Symbols** na koniec listy fallbacków i
+[nie ma opcji przesunięcia glifu w pionie](https://wezterm.org/config/fonts.html)
+(`wezterm.font` przyjmuje tylko `weight` / `italic` / `stretch` / `scale`).
 
-1. Zmień glif (w `config.fish` są zakomentowane alternatywy przy `pk_os_icon`).
-   macOS domyślnie używa już wariantu Font Awesome.
-2. Przestaw terminal na **w pełni patchowany** Nerd Font jako font główny
-   (`JetBrainsMono Nerd Font`), zamiast doklejać `Symbols Only` jako fallback —
-   wtedy wszystkie glify mają metryki jednego pliku fontu. W WezTerm:
-   `font = wezterm.font("JetBrainsMono Nerd Font")`.
+Rozwiązanie dwuczęściowe:
 
----
+**1. Patchowany Nerd Font jako font GŁÓWNY** — tekst i ikonki w jednym pliku,
+jedne metryki. Domyślnie **Ioskeley Mono Term Nerd Font**: konfiguracja Iosevki
+naśladująca Berkeley Mono — geometryczna i ostra jak bitmapa, ale skaluje się
+płynnie. Szersza niż czysta Iosevka (ta jest za ciasna na kolumny), nadal
+prostokątna, nie kwadratowa.
+
+Wersji Nerd Font nie ma w Homebrew, więc `setup-mac.sh -d` ściąga
+`IoskeleyMono-Term-NerdFont.zip` z najnowszego release'u i instaluje do
+`~/Library/Fonts` (funkcja `install_ioskeley`).
+
+Alternatywy z casków: `font-jetbrains-mono-nerd-font` (najlepszy
+z konwencjonalnych), `font-sauce-code-pro-nerd-font` (nieco chudy),
+`font-hack-nerd-font` (grubsze kreski), `font-iosevka-term-nerd-font`.
+
+Nerd Fonts nazywa rodziny niekonsekwentnie — po instalacji sprawdź dokładną
+nazwę i wpisz ją do configu:
+
+```bash
+wezterm ls-fonts --list-system | grep -i ioskeley
+```
+
+**2. Logo Apple z fontu SYSTEMOWEGO, nie z Nerd Fonta.** Prompt używa na macOS
+`U+F8FF`. Nerd Font nie obsadza tego punktu kodowego (jego zakresy to
+`E000-F533` i `F0001-F1AF0`), więc glif dostarcza SF Pro / Menlo — a tam logo
+jest zaprojektowane jako **zwykły znak tekstowy**, stojący na wspólnym
+baseline. Jest jednak rysowane małe, więc powiększamy je per-fallback:
+
+```lua
+config.font = wezterm.font_with_fallback {
+    'JetBrainsMono Nerd Font',
+    { family = 'Apple Symbols', scale = 1.35 },
+    { family = 'Menlo',         scale = 1.35 },
+}
+```
+
+Uwaga: `scale` działa **tylko** w `font_with_fallback`
+([docs](https://wezterm.org/config/lua/wezterm/font_with_fallback.html)).
+`wezterm.font()` go nie zna — przyjmuje jedynie `weight` / `stretch` / `style` /
+`harfbuzz_features` / `freetype_*`. Dlatego font jest deklarowany listą, nawet
+przy jednym foncie głównym.
+
+`scale` nie zmienia metryk komórki, więc gdy powiększony glif zacznie być
+przycinany, podnieś `line_height` do 1.05-1.1. Którą rodzinę fontu naprawdę
+dostaje ten glif, sprawdzisz przez `wezterm ls-fonts --text ''` — i to ją
+wpisujesz do listy.
+
+### Ostrość czcionki na macOS
+
+macOS wygładza tekst agresywnie i patched fonty potrafią przez to wyglądać
+mdło. W `wezterm.lua`:
+
+```lua
+config.freetype_load_target = 'Mono'             -- pełny hinting, najostrzej
+config.freetype_render_target = 'HorizontalLcd'  -- subpixel = ostrzej na LCD
+--config.freetype_render_target = 'Mono'         -- zero antyaliasingu, czysty bitmap
+--config.freetype_load_target = 'Light'          -- łagodniej, gdy 'Mono' za twarde
+```
+
+`Mono` + `HorizontalLcd` to najostrzejsza kombinacja, która nadal wygląda jak
+tekst: kreski przyciągnięte do siatki pikseli, ale subpixel wygładza krawędzie.
+`Mono` + `Mono` daje prawdziwie bitmapowy wygląd, bez żadnego antyaliasingu.
+
+Plus systemowo (wymaga wylogowania):
+
+```bash
+defaults -currentHost write -g AppleFontSmoothing -int 0   # wyłącz wygładzanie
+defaults -currentHost delete -g AppleFontSmoothing         # przywróć
+```
+
+### CLI `wezterm` nie istnieje w shellu
+
+WezTerm trzyma CLI **wewnątrz bundla `.app`** i nie linkuje go do `/usr/local/bin`,
+więc `wezterm ls-fonts`, `wezterm cli` itd. nie działają out of the box.
+`config.fish` dodaje teraz ścieżkę:
+
+```fish
+test -d /Applications/WezTerm.app/Contents/MacOS
+and fish_add_path /Applications/WezTerm.app/Contents/MacOS
+```
+
+Sprawdzenie, z którego **pliku** fontu bierze się dany glif:
+
+```bash
+wezterm ls-fonts --text ' A '
+```
+
+To jest kluczowe przy `scale`: **`scale` działa tylko na font, który faktycznie
+dostarczy glif**. Jeśli jabłko dalej jest małe mimo `scale = 2.0`, znaczy to, że
+glif bierze się z zupełnie innej rodziny — z bundlowanego fallbacku WezTerma
+albo z samego fontu głównego. `ls-fonts --text` powie z której; dopisujesz ją
+do listy i dopiero wtedy `scale` zadziała.
+
+Jeśli mimo wszystko ikonka nie pasuje — wyłącz ją (`set -g pk_show_os 0`).
+Na maszynie, która zawsze jest tym samym makiem, jabłko nie niesie żadnej
+informacji, a hostname i tak ją odróżnia.
+
+### Kolory: nazwy z palety, nie hexy
+
+Prompt i configi używają **nazwanych kolorów base16** (`brgreen`, `white`,
+`brmagenta`, `brblack`), nie `#rrggbb`. Nazwane kolory bierze się z motywu
+terminala, więc działają tak samo w WezTerm, VS Code, tmux i przez ssh na
+256-kolorowym `TERM`. Hex wymaga truecolor i rozjeżdża się przy zmianie motywu.
 
 ## 3. Prompt — jedna linia + transient
 
@@ -145,6 +243,29 @@ Zmierz prompt po zmianach:
 hyperfine --warmup 3 'fish -c "fish_prompt"'
 fish --profile-startup /tmp/p.log -i -c exit; sort -t' ' -k2 -rn /tmp/p.log | head
 ```
+
+## 3b. VS Code
+
+`.config/vscode/dotfiles-settings.json` **celowo nie jest kopiowany** przez
+`copy.sh`. VS Code trzyma w `settings.json` mnóstwo rzeczy per-projekt
+i per-rozszerzenie — nadpisanie go skryptem gwarantuje utratę ustawień.
+
+Dwa sposoby wgrania:
+
+```bash
+# 1) ręcznie: Cmd+Shift+P -> "Preferences: Open User Settings (JSON)", wklej klucze
+
+# 2) skryptem scalającym — robi backup, zachowuje twoje pozostałe klucze
+./.config/vscode/merge-settings.sh
+```
+
+Skrypt radzi sobie z JSONC (komentarze, trailing commas), ale **komentarze
+z twojego `settings.json` znikną** po scaleniu — backup zostaje z timestampem,
+więc nic nie przepada bezpowrotnie.
+
+Co jest w pliku poza fontem: `fish` jako domyślny profil terminala, scrollback
+20k, kursor blokowy, wyłączona minimapa i telemetria, trim trailing whitespace,
+`git.autofetch`, `diffEditor.ignoreTrimWhitespace: false`.
 
 ## 4. Kolorowanie logów — odpowiedź na pytanie o `grc`
 

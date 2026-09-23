@@ -62,9 +62,52 @@ BREW_MISC=(
 
 # --- Casks -------------------------------------------------------------------
 BREW_CASKS=(
-    font-jetbrains-mono-nerd-font   # pelny patched font (litery + ikonki)
-    font-symbols-only-nerd-font     # same symbole, do fallbacku w innym foncie
+    # PELNE patched fonty — tekst i ikonki w jednym pliku, wspolne metryki.
+    # To jedyny niezawodny sposob, zeby ikonki stały rowno z tekstem.
+    # Ioskeley Mono (font domyslny) leci przez install_ioskeley() w sekcji -d,
+    # bo wersja Nerd Font jest tylko w release'ach na GitHubie.
+    font-jetbrains-mono-nerd-font   # najlepszy z konwencjonalnych
+    font-sauce-code-pro-nerd-font   # patched Source Code Pro; nieco chudy
+    font-hack-nerd-font             # grubsze kreski, klasyk
+    font-iosevka-term-nerd-font     # czysta Iosevka; za ciasna na kolumny
+    # font-symbols-only-nerd-font   # NIE uzywac jako fallback: wlasny baseline
 )
+
+# ----------------------------------------------------------------------------
+#  Ioskeley Mono Term Nerd Font — font domyslny.
+#  Konfiguracja Iosevki nasladujaca Berkeley Mono: geometryczna i ostra jak
+#  bitmapa, ale skaluje sie plynnie. Wersji Nerd Font nie ma w brew, wiec
+#  bierzemy .zip z release'ow. Cask (bez ikonek) probujemy dla porzadku.
+# ----------------------------------------------------------------------------
+install_ioskeley() {
+    local repo="ahatem/IoskeleyMono"
+    local asset="IoskeleyMono-Term-NerdFont.zip"
+    local dest="$HOME/Library/Fonts"
+    local tmp; tmp="$(mktemp -d)"
+
+    brew install --cask font-ioskeley-mono 2>/dev/null || true
+
+    echo "==> Ioskeley Mono Term Nerd Font"
+    local url
+    url="$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+          | grep -o "https://[^\"]*${asset}" | head -1)"
+    if [[ -z "$url" ]]; then
+        echo "    !! nie znalazlem ${asset} w najnowszym release"
+        echo "    !! pobierz recznie: https://github.com/${repo}/releases"
+        rm -rf "$tmp"; return 0
+    fi
+
+    curl -fsSL -o "${tmp}/${asset}" "$url"
+    unzip -qo "${tmp}/${asset}" -d "${tmp}/f"
+    mkdir -p "$dest"
+    find "${tmp}/f" -name '*.ttf' -o -name '*.otf' | while read -r f; do
+        cp -f "$f" "$dest/"
+    done
+    rm -rf "$tmp"
+    echo "    OK -> $dest"
+    echo "    Sprawdz dokladna nazwe rodziny:"
+    echo "      wezterm ls-fonts --list-system | grep -i ioskeley"
+}
 
 main() {
     parse "$@"
@@ -79,6 +122,7 @@ main() {
     fi
 
     if [[ ${INSTALL_DOWNLOADABLE:-0} -eq 1 ]]; then
+        install_ioskeley
         # tmux plugin manager
         [[ -d ~/.tmux/plugins/tpm ]] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
         # rust toolchain — potrzebny tylko dla -c / -u ponizej
