@@ -82,19 +82,8 @@ set -g __fish_git_prompt_char_stashstate     '$'
 set -g __fish_git_prompt_char_upstream_ahead '↑'
 set -g __fish_git_prompt_char_upstream_behind '↓'
 
-# Ikona systemu: liczona RAZ przy starcie (jeden fork uname), nigdy w prompcie.
-#
-# IKONA macOS = U+F8FF, czyli logo Apple z FONTU SYSTEMOWEGO, nie z Nerd Fonta.
-# Nerd Font nie obsadza tego punktu kodowego (jego zakresy to E000-F533
-# i F0001-F1AF0), wiec glif dostarcza SF Pro / Menlo — a tam logo jest
-# zaprojektowane jako zwykly znak tekstowy: dokladnie wysokosci liter
-# i na wspolnym baseline. Stad rowna wysokosc z '[I]'.
-# Minus: dziala tylko na macOS. Na Linuksie i tak uzywamy innych glifow.
-#
 # Gdyby jednak nie pasowalo, alternatywy z Nerd Fonta (odkomentuj jedna):
 #set -g pk_os_icon ''      # Font Awesome, U+F179
-#set -g pk_os_icon '󰀵'      # Material Design Icons, U+F0035
-#set -g pk_os_icon ''      # Font Logos, U+F302
 #set -g pk_show_os 0        # ...albo po prostu wylacz: hostname i tak odroznia maszyny
 if not set -q pk_os_icon
     switch (uname -s)
@@ -276,12 +265,7 @@ function fish_user_key_bindings
     end
 end
 
-# ============================================================================
-#  TRYB VI
-#  UWAGA: fish przerysowuje CALY prompt przy kazdej zmianie trybu
-#  (fish-shell#5783) — dlatego prompt wyzej nie forkuje ani razu.
-# ============================================================================
-fish_vi_key_bindings                  # <- zakomentuj = emacs bindings
+fish_vi_key_bindings
 set -g fish_cursor_default block
 set -g fish_cursor_insert line
 set -g fish_cursor_replace_one underscore
@@ -329,7 +313,7 @@ fish_add_path ~/.docker/bin
 if status is-interactive
     type -q zoxide; and zoxide init fish | source          # z / zi
     #type -q mise; and mise activate fish | source          # wersje runtimeow
-    #type -q fzf; and fzf --fish | source                   # nadpisuje Ctrl-R fisha
+    type -q fzf; and fzf --fish | source                   # nadpisuje Ctrl-R fisha
     #type -q direnv; and direnv hook fish | source
 
     # kubectl/helm/gh: NIE 'xxx completion fish | source' tutaj (fork na start).
@@ -343,21 +327,21 @@ abbr -a e nvim
 abbr -a vim nvim
 abbr -a vi nvim
 
-alias ls   'eza --icons --group-directories-first'
-alias ll   'eza --icons --group-directories-first -l --git'
-alias la   'eza --icons --group-directories-first -la --git'
-alias lt   'eza --icons --group-directories-first --tree --level=2'
+alias ls   'eza --icons --group-directories-first --sort modified'
+alias ll   'eza --icons --group-directories-first --sort modified -l --git'
+alias la   'eza --icons --group-directories-first --sort modified -la --git'
+alias lt   'eza --icons --group-directories-first --sort modified --tree --level=2'
 alias tree 'eza --icons --tree'
 
-alias cat  'bat --paging=never'
-alias less 'bat'
-alias du   'dust'
-alias ps   'procs'
-alias top  'btm'
-alias sed  'sd'                          # UWAGA: inna skladnia niz sed
-alias find 'fd'                          # UWAGA: inna skladnia niz find
-alias grep 'rg'
-alias curl 'xh'                          # oryginal: 'command curl'
+#alias cat  'bat --paging=never'
+#alias less 'bat'
+#alias du   'dust'
+#alias ps   'procs'
+#alias top  'btm'
+#alias sed  'sd'                          # UWAGA: inna skladnia niz sed
+#alias find 'fd'                          # UWAGA: inna skladnia niz find
+#alias grep 'rg'
+#alias curl 'xh'                          # oryginal: 'command curl'
 alias kubectl 'kubecolor'
 #source /opt/homebrew/etc/grc.fish        # grc dla ping/df/traceroute/...
 
@@ -396,3 +380,16 @@ abbr -a tsp tspin
 #  NIE wolaj w hot-pathcie — to fork basha.
 # ============================================================================
 #bass source ~/.profile
+
+function cht 
+    xh -b "cht.sh/$argv[1]" User-Agent:curl
+end
+bind -M insert ctrl-f accept-autosuggestion
+
+function _last_cmd; echo $history[1]; end
+function _last_arg; echo $history[1] | read -lat a; echo $a[-1]; end
+function _last_args; echo $history[1] | read -lat a; echo $a[2..-1]; end
+
+abbr -a '!!' --position anywhere --function _last_cmd
+abbr -a '!$' --position anywhere --function _last_arg
+abbr -a '!*' --position anywhere --function _last_args

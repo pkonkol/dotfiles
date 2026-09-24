@@ -11,6 +11,7 @@ BREW_CORE=(
     fish tmux neovim git
     coreutils          # gnu ls/date/... jako g-prefixed
     curl wget
+    tree-sitter-cli
 )
 
 # --- Nowoczesne zamienniki klasykow (wiekszosc w Rust) ----------------------
