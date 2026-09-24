@@ -46,11 +46,36 @@ BREW_COLOR=(
     bat                # (juz wyzej, ale tu tez pasuje)
 )
 
+# --- Cloud / k8s / IaC -------------------------------------------------------
+#  ZASADA: przez mise ida TYLKO te narzedzia, ktorych wersja jest sprzezona
+#  z czyms zewnetrznym (state, lockfile, wersja klastra). Cala reszta z brew.
+#  Ponizsze nie maja takiego sprzezenia — wersja nie ma znaczenia, wiec brew.
+BREW_CLOUD=(
+    awscli             # v2; backward-compatible, chcesz najnowsze. Ma EKS wbudowane.
+    helm
+    kustomize          # kubectl ma to wbudowane jako 'apply -k'; osobna binarka do 'build'
+    k9s                # TUI do klastra
+    kubectx            # kubectx / kubens
+    kubecolor
+    #stern             # logi z wielu podow naraz
+
+    # --- lokalne klastry do debugowania (nie koliduja, moga byc wszystkie) ---
+    k3d                # k3s w dockerze: najszybszy, ma ingress + LoadBalancer z pudelka
+    kind               # czysty upstream k8s w dockerze; tego uzywa wiekszosc CI
+    minikube           # najstarszy, najwiecej addonow (dashboard, ingress, registry)
+)
+
+# Docker Desktop — macie licencje firmowa.
+# UWAGA: nie instaluj formuly 'docker' (samo CLI) obok Desktopa — koliduja.
+# BREW_CLOUD_CASKS=(
+#     docker-desktop     # starsza nazwa casku to po prostu 'docker'; sprawdz: brew search docker
+# )
+
 # --- Dev / wersje runtimeow --------------------------------------------------
 BREW_DEV=(
     git-delta lazygit gh
     mise               # wersje node/python/java/go per katalog (zastepuje nvm/pyenv/asdf/sdkman)
-    uv                 # python packaging
+    uv
     shellcheck
     direnv
 )
@@ -63,14 +88,10 @@ BREW_MISC=(
 
 # --- Casks -------------------------------------------------------------------
 BREW_CASKS=(
-    # PELNE patched fonty — tekst i ikonki w jednym pliku, wspolne metryki.
-    # To jedyny niezawodny sposob, zeby ikonki stały rowno z tekstem.
-    # Ioskeley Mono (font domyslny) leci przez install_ioskeley() w sekcji -d,
-    # bo wersja Nerd Font jest tylko w release'ach na GitHubie.
     font-jetbrains-mono-nerd-font   # najlepszy z konwencjonalnych
-    font-sauce-code-pro-nerd-font   # patched Source Code Pro; nieco chudy
-    font-hack-nerd-font             # grubsze kreski, klasyk
-    font-iosevka-term-nerd-font     # czysta Iosevka; za ciasna na kolumny
+    # font-sauce-code-pro-nerd-font   # patched Source Code Pro; nieco chudy
+    # font-hack-nerd-font             # grubsze kreski, klasyk
+    # font-iosevka-term-nerd-font     # czysta Iosevka; za ciasna na kolumny
     # font-symbols-only-nerd-font   # NIE uzywac jako fallback: wlasny baseline
 )
 
@@ -110,6 +131,40 @@ install_ioskeley() {
     echo "      wezterm ls-fonts --list-system | grep -i ioskeley"
 }
 
+# ----------------------------------------------------------------------------
+#  mise — TYLKO narzedzia sprzezone wersja z czyms zewnetrznym.
+#
+#  terraform  -> wersja zapisana w state; nowsza binarka podbija format i
+#                starsza go nie otworzy. Sprzezenie z REPO.
+#  node       -> package-lock / pole "engines"; globalny node lamie sie przy
+#                kazdym brew upgrade. Sprzezenie z REPO.
+#  kubectl    -> powinien byc +-1 minor od wersji klastra. Sprzezenie z KLASTREM,
+#                ale przy jednym klastrze brew w zupelnosci wystarcza.
+#
+#  `mise use` JUZ INSTALUJE — osobne `mise install` jest potrzebne tylko do
+#  odtworzenia srodowiska z gotowego mise.toml (np. po klonie repo).
+# ----------------------------------------------------------------------------
+install_mise_tools() {
+    command -v mise >/dev/null || { echo "!! brak mise (brew install mise)"; return 1; }
+
+    # Globalnie = wersja zapasowa, gdy jestes POZA projektem. Dla node'a
+    # bezpieczne: skrypty ad hoc nie maja stanu do zepsucia.
+    mise use -g node@lts
+
+    # terraform CELOWO nie leci globalnie na @latest. Gdybys wszedl do repo
+    # bez mise.toml, dostalbys najnowszy i mogl podbic state'a produkcyjnego.
+    # Przypnij wersje, ktorej uzywa zespol:
+    #mise use -g terraform@1.9.8
+
+    # kubectl: odkomentuj tylko gdy pracujesz z klastrami roznych wersji.
+    #mise use -g kubectl@latest
+
+    echo
+    echo "==> W KATALOGU PROJEKTU (to jest wlasciwe uzycie mise):"
+    echo "      mise use terraform@1.9.8 node@20"
+    echo "    zapisuje mise.toml -> commitujesz -> kolega robi 'mise install'"
+}
+
 main() {
     parse "$@"
 
@@ -118,8 +173,10 @@ main() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
         brew install "${BREW_CORE[@]}" "${BREW_MODERN[@]}" "${BREW_COLOR[@]}" \
-                     "${BREW_DEV[@]}" "${BREW_MISC[@]}"
+                     "${BREW_DEV[@]}" "${BREW_MISC[@]}" "${BREW_CLOUD[@]}"
         brew install --cask "${BREW_CASKS[@]}"
+        # brew install --cask "${BREW_CLOUD_CASKS[@]}" || \
+        #     echo "!! cask docker-desktop nie przeszedl — sprawdz 'brew search docker'"
     fi
 
     if [[ ${INSTALL_DOWNLOADABLE:-0} -eq 1 ]]; then
@@ -149,6 +206,10 @@ main() {
     fi
 
     # --- OPCJONALNE: zbuduj najnowsze wersje z cargo zamiast brew -----------
+    if [[ ${MISE_TOOLS:-0} -eq 1 ]]; then
+        install_mise_tools
+    fi
+
     if [[ ${CARGO_BUILD_ESSENTIAL:-0} -eq 1 ]]; then
         source "$HOME/.cargo/env"
         cargo install eza bat fd-find ripgrep sd git-delta zoxide tealdeer cargo-cache
@@ -170,6 +231,7 @@ Usage: $0 [-a] [-b] [-d] [-f] [-c] [-u] [-y]
   -b    Pakiety Homebrew (to jest jedyne co realnie potrzebne na macOS)
   -d    Pobierane rzeczy (tpm, rustup)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
+  -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
   -c    OPCJA: zbuduj podstawowe narzedzia z cargo (najnowsze wersje)
   -u    OPCJA: zbuduj dodatkowe narzedzia z cargo
   -y    Wgraj dotfiles do \$HOME
@@ -179,12 +241,13 @@ USAGE
 
 parse() {
     [[ $# -eq 0 ]] && usage
-    while getopts "abdfcuy" opt; do
+    while getopts "abdfmcuy" opt; do
         case ${opt} in
-            a ) INSTALL_BREW=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; DEPLOY_DOTFILES=1 ;;
+            a ) INSTALL_BREW=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; MISE_TOOLS=1; DEPLOY_DOTFILES=1 ;;
             b ) INSTALL_BREW=1 ;;
             d ) INSTALL_DOWNLOADABLE=1 ;;
             f ) PREPARE_FISH=1 ;;
+            m ) MISE_TOOLS=1 ;;
             c ) CARGO_BUILD_ESSENTIAL=1 ;;
             u ) CARGO_BUILD_ADDITIONAL=1 ;;
             y ) DEPLOY_DOTFILES=1 ;;

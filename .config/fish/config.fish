@@ -312,7 +312,7 @@ fish_add_path ~/.docker/bin
 # ============================================================================
 if status is-interactive
     type -q zoxide; and zoxide init fish | source          # z / zi
-    #type -q mise; and mise activate fish | source          # wersje runtimeow
+    type -q mise; and mise activate fish | source           # node/terraform/kubectl per projekt
     type -q fzf; and fzf --fish | source                   # nadpisuje Ctrl-R fisha
     #type -q direnv; and direnv hook fish | source
 
@@ -354,11 +354,21 @@ abbr -a gp 'git push'
 abbr -a gl 'git pull --rebase'
 abbr -a lg lazygit
 
-abbr -a k kubectl
-abbr -a kgp 'kubectl get pods'
-abbr -a kgs 'kubectl get svc'
-abbr -a kctx 'kubectl config use-context'
-abbr -a tsp tspin
+abbr -a k    kubectl
+abbr -a kgp  'kubectl get pods'
+abbr -a kgs  'kubectl get svc'
+abbr -a kgn  'kubectl get nodes'
+abbr -a kd   'kubectl describe'
+abbr -a kl   'kubectl logs -f'
+
+# --- terraform / aws ---
+abbr -a tf   terraform
+abbr -a tfi  'terraform init'
+abbr -a tfp  'terraform plan'
+abbr -a tfa  'terraform apply'
+abbr -a awsp 'aws --profile'
+abbr -a awsw 'aws sts get-caller-identity'   # "kim jestem" — pierwsza komenda przy kazdym bledzie 403
+set -gx AWS_PAGER ''                          # AWS CLI v2 domyslnie wrzuca output do pagera
 
 # ============================================================================
 #  LINUX-ONLY (homelab / raspberry pi) — zakomentowane, nie usuwac
