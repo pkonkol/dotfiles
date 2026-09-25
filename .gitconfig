@@ -5,6 +5,12 @@
 [includeIf "gitdir:~/projects/"]
 	path = ~/.gitconfig-personal
 [alias]
+	# difftastic = diff swiadomy SKLADNI (porownuje drzewa AST, ignoruje
+	# przeformatowanie). NIE ustawiamy go jako diff.external globalnie, bo
+	# psulby `git diff | patch`, --stat i delte. Zamiast tego osobne aliasy:
+	dft = -c diff.external=difft diff
+	shf = -c diff.external=difft show
+	lgf = -c diff.external=difft log -p
 	lg = log --all --graph --decorate --oneline
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	hist = log --pretty=format:\"%h %ad|%s%d [%an]\" --graph --date=short

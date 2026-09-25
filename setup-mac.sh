@@ -39,11 +39,9 @@ BREW_MODERN=(
 BREW_COLOR=(
     tailspin           # kolorowanie logow w locie (binarka: tspin)
     kubecolor          # kubectl + kolory
-    grc                # generyczny kolorowacz wrapper (ping/df/traceroute/...)
-    lnav               # nawigator po logach (kursor, SQL po logach)
-    delta              # git diff  (formula: git-delta)
+    # grc                # kolorowacz-wrapper dla ping/df/traceroute (Python)
+    lnav               # nawigator po logach z SQL
     difftastic         # diff swiadomy skladni (binarka: difft)
-    bat                # (juz wyzej, ale tu tez pasuje)
 )
 
 # --- Cloud / k8s / IaC -------------------------------------------------------
@@ -56,20 +54,13 @@ BREW_CLOUD=(
     kustomize          # kubectl ma to wbudowane jako 'apply -k'; osobna binarka do 'build'
     k9s                # TUI do klastra
     kubectx            # kubectx / kubens
-    kubecolor
+    kubecolor            # JEDNO zrodlo prawdy — NIE bierz go rownolegle z mise
     #stern             # logi z wielu podow naraz
-
-    # --- lokalne klastry do debugowania (nie koliduja, moga byc wszystkie) ---
     k3d                # k3s w dockerze: najszybszy, ma ingress + LoadBalancer z pudelka
     kind               # czysty upstream k8s w dockerze; tego uzywa wiekszosc CI
     minikube           # najstarszy, najwiecej addonow (dashboard, ingress, registry)
+    #docker-desktop # na razie wgrane przez .dmg
 )
-
-# Docker Desktop — macie licencje firmowa.
-# UWAGA: nie instaluj formuly 'docker' (samo CLI) obok Desktopa — koliduja.
-# BREW_CLOUD_CASKS=(
-#     docker-desktop     # starsza nazwa casku to po prostu 'docker'; sprawdz: brew search docker
-# )
 
 # --- Dev / wersje runtimeow --------------------------------------------------
 BREW_DEV=(
@@ -82,25 +73,14 @@ BREW_DEV=(
 
 # --- Sieciowe / reszta -------------------------------------------------------
 BREW_MISC=(
-    whois nmap syncthing translate-shell
-    ffmpeg poppler imagemagick sevenzip   # podglady w yazi
+    ffmpeg poppler sevenzip
+    whois nmap syncthing translate-shell imagemagick
 )
 
-# --- Casks -------------------------------------------------------------------
 BREW_CASKS=(
-    font-jetbrains-mono-nerd-font   # najlepszy z konwencjonalnych
-    # font-sauce-code-pro-nerd-font   # patched Source Code Pro; nieco chudy
-    # font-hack-nerd-font             # grubsze kreski, klasyk
-    # font-iosevka-term-nerd-font     # czysta Iosevka; za ciasna na kolumny
-    # font-symbols-only-nerd-font   # NIE uzywac jako fallback: wlasny baseline
+    font-jetbrains-mono-nerd-font
 )
 
-# ----------------------------------------------------------------------------
-#  Ioskeley Mono Term Nerd Font — font domyslny.
-#  Konfiguracja Iosevki nasladujaca Berkeley Mono: geometryczna i ostra jak
-#  bitmapa, ale skaluje sie plynnie. Wersji Nerd Font nie ma w brew, wiec
-#  bierzemy .zip z release'ow. Cask (bez ikonek) probujemy dla porzadku.
-# ----------------------------------------------------------------------------
 install_ioskeley() {
     local repo="ahatem/IoskeleyMono"
     local asset="IoskeleyMono-Term-NerdFont.zip"
@@ -146,23 +126,7 @@ install_ioskeley() {
 # ----------------------------------------------------------------------------
 install_mise_tools() {
     command -v mise >/dev/null || { echo "!! brak mise (brew install mise)"; return 1; }
-
-    # Globalnie = wersja zapasowa, gdy jestes POZA projektem. Dla node'a
-    # bezpieczne: skrypty ad hoc nie maja stanu do zepsucia.
     mise use -g node@lts
-
-    # terraform CELOWO nie leci globalnie na @latest. Gdybys wszedl do repo
-    # bez mise.toml, dostalbys najnowszy i mogl podbic state'a produkcyjnego.
-    # Przypnij wersje, ktorej uzywa zespol:
-    #mise use -g terraform@1.9.8
-
-    # kubectl: odkomentuj tylko gdy pracujesz z klastrami roznych wersji.
-    #mise use -g kubectl@latest
-
-    echo
-    echo "==> W KATALOGU PROJEKTU (to jest wlasciwe uzycie mise):"
-    echo "      mise use terraform@1.9.8 node@20"
-    echo "    zapisuje mise.toml -> commitujesz -> kolega robi 'mise install'"
 }
 
 main() {
@@ -186,6 +150,7 @@ main() {
         # rust toolchain — potrzebny tylko dla -c / -u ponizej
         command -v rustup >/dev/null 2>&1 || \
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        cargo install rgrc
     fi
 
     if [[ ${PREPARE_FISH:-0} -eq 1 ]]; then

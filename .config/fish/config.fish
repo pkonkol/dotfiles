@@ -270,6 +270,7 @@ set -g fish_cursor_default block
 set -g fish_cursor_insert line
 set -g fish_cursor_replace_one underscore
 set -g fish_cursor_visual block
+bind -M insert ctrl-f accept-autosuggestion   # po fish_vi_key_bindings, inaczej znika
 
 # ============================================================================
 #  ZACHOWANIE POWLOKI
@@ -323,6 +324,9 @@ end
 # ============================================================================
 #  ALIASY / ABBR   (abbr rozwija sie w miejscu — widzisz co naprawde odpalasz)
 # ============================================================================
+
+rgrc --aliases | source
+
 abbr -a e nvim
 abbr -a vim nvim
 abbr -a vi nvim
@@ -332,18 +336,7 @@ alias ll   'eza --icons --group-directories-first --sort modified -l --git'
 alias la   'eza --icons --group-directories-first --sort modified -la --git'
 alias lt   'eza --icons --group-directories-first --sort modified --tree --level=2'
 alias tree 'eza --icons --tree'
-
-#alias cat  'bat --paging=never'
-#alias less 'bat'
-#alias du   'dust'
-#alias ps   'procs'
-#alias top  'btm'
-#alias sed  'sd'                          # UWAGA: inna skladnia niz sed
-#alias find 'fd'                          # UWAGA: inna skladnia niz find
-#alias grep 'rg'
-#alias curl 'xh'                          # oryginal: 'command curl'
 alias kubectl 'kubecolor'
-#source /opt/homebrew/etc/grc.fish        # grc dla ping/df/traceroute/...
 
 abbr -a g git
 abbr -a gs 'git status'
@@ -370,6 +363,19 @@ abbr -a awsp 'aws --profile'
 abbr -a awsw 'aws sts get-caller-identity'   # "kim jestem" — pierwsza komenda przy kazdym bledzie 403
 set -gx AWS_PAGER ''                          # AWS CLI v2 domyslnie wrzuca output do pagera
 
+# --- bashowe !! / !$ / !* (rozwijaja sie w miejscu) ---
+function _last_cmd;  echo $history[1]; end
+function _last_arg;  echo $history[1] | read -lat a; echo $a[-1]; end
+function _last_args; echo $history[1] | read -lat a; echo $a[2..-1]; end
+abbr -a '!!' --position anywhere --function _last_cmd
+abbr -a '!$' --position anywhere --function _last_arg
+abbr -a '!*' --position anywhere --function _last_args
+
+# --- cheatsheet: cht tar ---
+function cht
+    xh -b "cht.sh/$argv[1]" User-Agent:curl
+end
+
 # ============================================================================
 #  LINUX-ONLY (homelab / raspberry pi) — zakomentowane, nie usuwac
 # ============================================================================
@@ -390,8 +396,7 @@ set -gx AWS_PAGER ''                          # AWS CLI v2 domyslnie wrzuca outp
 #  NIE wolaj w hot-pathcie — to fork basha.
 # ============================================================================
 #bass source ~/.profile
-
-function cht 
+function cht
     xh -b "cht.sh/$argv[1]" User-Agent:curl
 end
 bind -M insert ctrl-f accept-autosuggestion
