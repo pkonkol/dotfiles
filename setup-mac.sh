@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-# ============================================================================
-#  setup-mac.sh — bootstrap macOS
-#  Cel: `./setup-mac.sh -b -d -f -y` ma wystarczyc. Cargo jest OPCJONALNE
-#       (tylko gdy chcesz zbudowac najnowsze wersje sam).
-# ============================================================================
 set -euo pipefail
 
 # --- Rdzen: bez tego nic nie dziala -----------------------------------------
@@ -56,6 +51,7 @@ BREW_CLOUD=(
     kubectx            # kubectx / kubens
     kubecolor            # JEDNO zrodlo prawdy — NIE bierz go rownolegle z mise
     #stern             # logi z wielu podow naraz
+
     k3d                # k3s w dockerze: najszybszy, ma ingress + LoadBalancer z pudelka
     kind               # czysty upstream k8s w dockerze; tego uzywa wiekszosc CI
     minikube           # najstarszy, najwiecej addonow (dashboard, ingress, registry)
@@ -106,27 +102,18 @@ install_ioskeley() {
         cp -f "$f" "$dest/"
     done
     rm -rf "$tmp"
-    echo "    OK -> $dest"
-    echo "    Sprawdz dokladna nazwe rodziny:"
-    echo "      wezterm ls-fonts --list-system | grep -i ioskeley"
 }
 
-# ----------------------------------------------------------------------------
-#  mise — TYLKO narzedzia sprzezone wersja z czyms zewnetrznym.
-#
-#  terraform  -> wersja zapisana w state; nowsza binarka podbija format i
-#                starsza go nie otworzy. Sprzezenie z REPO.
-#  node       -> package-lock / pole "engines"; globalny node lamie sie przy
-#                kazdym brew upgrade. Sprzezenie z REPO.
-#  kubectl    -> powinien byc +-1 minor od wersji klastra. Sprzezenie z KLASTREM,
-#                ale przy jednym klastrze brew w zupelnosci wystarcza.
-#
-#  `mise use` JUZ INSTALUJE — osobne `mise install` jest potrzebne tylko do
-#  odtworzenia srodowiska z gotowego mise.toml (np. po klonie repo).
-# ----------------------------------------------------------------------------
 install_mise_tools() {
     command -v mise >/dev/null || { echo "!! brak mise (brew install mise)"; return 1; }
     mise use -g node@lts
+}
+
+install_iac_lsp() {
+    brew tap hashicorp/tap
+    brew install hashicorp/tap/terraform-ls
+    brew install helm-ls 2>/dev/null || \
+        echo "!! helm-ls nie w core — sprawdz 'brew search helm-ls' albo: go install github.com/mrjosh/helm-ls@latest"
 }
 
 main() {
@@ -139,8 +126,8 @@ main() {
         brew install "${BREW_CORE[@]}" "${BREW_MODERN[@]}" "${BREW_COLOR[@]}" \
                      "${BREW_DEV[@]}" "${BREW_MISC[@]}" "${BREW_CLOUD[@]}"
         brew install --cask "${BREW_CASKS[@]}"
-        # brew install --cask "${BREW_CLOUD_CASKS[@]}" || \
-        #     echo "!! cask docker-desktop nie przeszedl — sprawdz 'brew search docker'"
+        install_mise_tools
+        install_iac_lsp
     fi
 
     if [[ ${INSTALL_DOWNLOADABLE:-0} -eq 1 ]]; then
@@ -170,11 +157,6 @@ main() {
         command -v mise    >/dev/null && mise    completion fish > ~/.config/fish/completions/mise.fish
     fi
 
-    # --- OPCJONALNE: zbuduj najnowsze wersje z cargo zamiast brew -----------
-    if [[ ${MISE_TOOLS:-0} -eq 1 ]]; then
-        install_mise_tools
-    fi
-
     if [[ ${CARGO_BUILD_ESSENTIAL:-0} -eq 1 ]]; then
         source "$HOME/.cargo/env"
         cargo install eza bat fd-find ripgrep sd git-delta zoxide tealdeer cargo-cache
@@ -196,6 +178,7 @@ Usage: $0 [-a] [-b] [-d] [-f] [-c] [-u] [-y]
   -b    Pakiety Homebrew (to jest jedyne co realnie potrzebne na macOS)
   -d    Pobierane rzeczy (tpm, rustup)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
+  -l    LSP dla IaC w nvim: terraform-ls (tap HashiCorpa) + helm-ls
   -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
   -c    OPCJA: zbuduj podstawowe narzedzia z cargo (najnowsze wersje)
   -u    OPCJA: zbuduj dodatkowe narzedzia z cargo
@@ -206,13 +189,12 @@ USAGE
 
 parse() {
     [[ $# -eq 0 ]] && usage
-    while getopts "abdfmcuy" opt; do
+    while getopts "abdfmlcuy" opt; do
         case ${opt} in
             a ) INSTALL_BREW=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; MISE_TOOLS=1; DEPLOY_DOTFILES=1 ;;
             b ) INSTALL_BREW=1 ;;
             d ) INSTALL_DOWNLOADABLE=1 ;;
             f ) PREPARE_FISH=1 ;;
-            m ) MISE_TOOLS=1 ;;
             c ) CARGO_BUILD_ESSENTIAL=1 ;;
             u ) CARGO_BUILD_ADDITIONAL=1 ;;
             y ) DEPLOY_DOTFILES=1 ;;

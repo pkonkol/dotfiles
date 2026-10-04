@@ -3,7 +3,7 @@
 #     cd ~/projects/dotfiles && ./copy.sh && exec fish
 set -e
 
-mkdir -p ~/.config/fish ~/.config/delta ~/.config/wezterm
+mkdir -p ~/.config/fish ~/.config/delta ~/.config/wezterm ~/.config/nvim
 
 # Sprzatanie po starym setupie (starship + rozbite pliki promptu).
 # Wazne: plik w ~/.config/fish/functions/fish_prompt.fish MA PIERWSZENSTWO
@@ -20,6 +20,7 @@ cp -i  .gitconfig              ~/
 cp -ri .config/delta           ~/.config/
 cp     .config/fish/config.fish    ~/.config/fish/config.fish
 cp -i  .config/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
+cp -r  .config/nvim/              ~/.config/     # init.lua + after/queries/
 
 # VS Code — CELOWO bez autokopiowania: settings.json VS Code trzyma mnostwo
 # rzeczy per-projekt i per-rozszerzenie, wiec nadpisanie go skryptem

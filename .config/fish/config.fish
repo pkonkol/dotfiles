@@ -60,16 +60,29 @@ set -g pk_postexec_min 1000      # ms; tylko dla komend dluzszych niz 1 s
 #     i dopiero wtedy komenda sie wykonuje. Podczas pisania prompt jest czysty,
 #     a w scrollbacku kazda WYWOLANA komenda ma znacznik = latwo znalezc cutoff.
 set -g pk_transient_enabled 1
-set -g pk_trans_style rule       # rule | blank | bg | none
-#   rule  — pozioma linia na CALA szerokosc nad promptem (domyslne, czytelne)
-#   blank — sama pusta linia nad promptem (najciszej)
-#   bg    — tlo pod promptem (kolorowo, ale psuje czytelnosc — odradzam)
+set -g pk_trans_style bg         # bg | rule | blank | none
+#   bg    — samo TLO pod promptem (domyslne; nie rysuje zadnej kreski,
+#           wiec nie kloci sie z ramkami paneli wezterma)
+#   rule  — pozioma linia na cala szerokosc nad promptem
+#   blank — sama pusta linia nad promptem
 #   none  — nic; zostaje tylko stopka ◀ po dlugich komendach
-set -g pk_rule_char '─'          # '━' grubsza, '╌' przerywana, '·' kropki
-set -g pk_trans_bg brblack       # uzywane tylko przy pk_trans_style = bg
-#   Celowo nazwa z palety terminala, nie '#005f5f': kolory nazwane bierze
-#   sie z motywu terminala, wiec dzialaja tak samo w WezTerm, VS Code, tmux
-#   i przez ssh na 256-kolorowym TERM-ie. Hex wymaga truecolor.
+set -g pk_rule_char '─'          # tylko dla pk_trans_style = rule
+
+# Tlo paska. WYJATEK od zasady "tylko nazwy z palety": w srcery wszystkie
+# kolory nazwane sa w intensywnosci PIERWSZEGO PLANU (nawet brblack to jasny
+# cieply szary #918175), wiec jako tlo albo przepalaja, albo zabijaja kolory
+# prompta. Potrzebny jest konkretny ciemny odcien, stad hex.
+# Ponizsze to oficjalne szarosci srcery (xgray2/3/4).
+# set -g pk_trans_bg 1A4873        # przygaszony srcery blue (#2C78BF scieniony)
+#set -g pk_trans_bg 2C78BF       # pelny srcery blue — mocno, ale zabija rozowy branch
+#set -g pk_trans_bg 1D3B53       # ciemniejszy granat
+#set -g pk_trans_bg 3A3A3A       # xgray3 — neutralna szarosc
+set -g pk_trans_bg 781814       # cieply, w strone srcery yellow (moja pochodna)
+
+# Tlo linii, ktora WLASNIE PISZESZ. Puste = brak tla, i tak ma byc:
+# podswietlanie KAZDEJ linii sprawia, ze nie widac, ktora komenda poszla.
+set -g pk_live_bg ''
+#set -g pk_live_bg 262626        # xgray1 — gdybys jednak chcial delikatne tlo
 
 # --- git prompt (natywny, w C — nie forkuje) ---
 set -g __fish_git_prompt_showdirtystate      1
@@ -115,8 +128,11 @@ function fish_mode_prompt; end
 function fish_prompt --description 'Jedna linia; po ENTER przerysowana z tlem'
     set -l last_status $status
 
-    # Czy to przerysowanie "po Enter"? Wtedy dorysuj marker nad promptem.
+    # Tlo linii pisanej (domyslne). Po Enter podmienione nizej na pk_trans_bg.
     set -l bg
+    test -n "$pk_live_bg"; and set bg --background=$pk_live_bg
+
+    # Czy to przerysowanie "po Enter"? Wtedy dorysuj marker nad promptem.
     if set -q __pk_transient; and test "$__pk_transient" = 1
         set -g __pk_transient 0
         switch "$pk_trans_style"
@@ -133,6 +149,10 @@ function fish_prompt --description 'Jedna linia; po ENTER przerysowana z tlem'
                 set bg --background=$pk_trans_bg
         end
     end
+
+    # Right prompt rysuje sie PO tej funkcji — przekaz mu to samo tlo,
+    # zeby pasek siegal takze prawej krawedzi.
+    set -g __pk_bg $bg
 
     # 1. tryb vi
     if test "$pk_show_mode" = 1; and contains -- "$fish_key_bindings" fish_vi_key_bindings fish_hybrid_key_bindings
@@ -198,22 +218,28 @@ end
 function fish_right_prompt --description 'Godzina, czas trwania, exit code, joby'
     set -l last_status $status
     test "$pk_right_enabled" = 1; or return
+    set -l bg $__pk_bg          # to samo tlo co lewy prompt
     set -l out
 
     if test "$pk_right_status" = 1; and test $last_status -ne 0
-        set out $out (set_color $pk_c_err)"✘ $last_status"(set_color normal)
+        set out $out (set_color $pk_c_err $bg)"✘ $last_status"
     end
     if test "$pk_right_jobs" = 1
         set -l n (count (jobs -p))
-        test $n -gt 0; and set out $out (set_color $pk_c_dim)"⚙ $n"(set_color normal)
+        test $n -gt 0; and set out $out (set_color $pk_c_dim $bg)"⚙ $n"
     end
     if test "$pk_right_duration" = 1; and test "$CMD_DURATION" -ge "$pk_right_dur_min" 2>/dev/null
-        set out $out (set_color $pk_c_dur)(__pk_dur $CMD_DURATION)(set_color normal)
+        set out $out (set_color $pk_c_dur $bg)(__pk_dur $CMD_DURATION)
     end
     if test "$pk_right_clock" = 1
-        set out $out (set_color $pk_c_time)(date "+$pk_clock_fmt")(set_color normal)
+        set out $out (set_color $pk_c_time $bg)(date "+$pk_clock_fmt")
     end
-    printf '%s' (string join ' ' $out)
+    test (count $out) -gt 0; or return
+    set -l pad ''
+    test (count $bg) -gt 0; and set pad ' '   # oddech wokol paska, tylko gdy jest tlo
+    set_color normal $bg
+    printf '%s%s%s' $pad (string join (set_color normal $bg)' ' $out) $pad
+    set_color normal
 end
 
 function __pk_dur --description 'ms -> 1h2m / 2m5s / 4.1s / 320ms'
@@ -325,7 +351,11 @@ end
 #  ALIASY / ABBR   (abbr rozwija sie w miejscu — widzisz co naprawde odpalasz)
 # ============================================================================
 
-rgrc --aliases | source
+# rgrc --aliases generuje wrappery dla ~80 komend. Guard, bo bez niego
+# config wywala blad przy starcie na kazdej maszynie bez rgrc (homelab, RPi).
+# UWAGA: te wrappery moga opakowac tez ls/df/du — jesli nadpisza aliasy
+# nizej, przenies ta linie na koniec sekcji albo wroc do listy selektywnej.
+type -q rgrc; and rgrc --aliases | source
 
 abbr -a e nvim
 abbr -a vim nvim
@@ -408,3 +438,5 @@ function _last_args; echo $history[1] | read -lat a; echo $a[2..-1]; end
 abbr -a '!!' --position anywhere --function _last_cmd
 abbr -a '!$' --position anywhere --function _last_arg
 abbr -a '!*' --position anywhere --function _last_args
+
+set -gx BAT_THEME srcery
