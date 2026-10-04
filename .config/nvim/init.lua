@@ -3,7 +3,14 @@ vim.pack.add({
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/folke/tokyonight.nvim",
   "https://github.com/srcery-colors/srcery-vim",
+  { src = "https://github.com/m4xshen/hardtime.nvim", lazy = false, dependencies = { "MunifTanjim/nui.nvim" }, opts = {}, },
+  { src = "https://github.com/tris203/precognition.nvim", opts = { highlightFullVirtLine = true } },
+  "https://github.com/ThePrimeagen/vim-be-good",
 })
+
+vim.opt.number = true
+require("precognition").toggle()
+require("hardtime").setup()
 
 vim.cmd.colorscheme("srcery")
 
@@ -37,18 +44,18 @@ vim.treesitter.language.register("terraform", "terraform-vars")
 --  Wzorzec lapie tylko katalog templates/, zeby Chart.yaml i values.yaml
 --  (ktore sa zwyklym YAML-em) zostaly przy parserze yaml.
 -- ---------------------------------------------------------------------------
-vim.filetype.add({
-  pattern = {
-    [".*/templates/.*%.ya?ml"] = "helm",
-    [".*/templates/.*%.tpl"] = "helm",
-    ["helmfile.*%.ya?ml"] = "helm",
-  },
-})
-vim.treesitter.language.register("gotmpl", "helm")
--- vim.api.nvim_create_autocmd("FileType", {
---   pattern = { "python", "toml", "lua" },
---   callback = function() pcall(vim.treesitter.start) end,
+-- vim.filetype.add({
+--   pattern = {
+--     [".*/templates/.*%.ya?ml"] = "helm",
+--     [".*/templates/.*%.tpl"] = "helm",
+--     ["helmfile.*%.ya?ml"] = "helm",
+--   },
 -- })
+-- vim.treesitter.language.register("gotmpl", "helm")
+-- -- vim.api.nvim_create_autocmd("FileType", {
+-- --   pattern = { "python", "toml", "lua" },
+-- --   callback = function() pcall(vim.treesitter.start) end,
+-- -- })
 vim.api.nvim_create_autocmd("FileType", {
   callback = function() pcall(vim.treesitter.start) end,
 })
