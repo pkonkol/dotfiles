@@ -137,6 +137,7 @@ main() {
         # rust toolchain — potrzebny tylko dla -c / -u ponizej
         command -v rustup >/dev/null 2>&1 || \
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+	# TODO lepsze miejsce, najlepiej w brew ale to ma dependencje na ten step totaj. Nie zapomne, moze tak wisiec na razie.
         cargo install rgrc
     fi
 
@@ -157,12 +158,16 @@ main() {
         command -v mise    >/dev/null && mise    completion fish > ~/.config/fish/completions/mise.fish
     fi
 
-    if [[ ${CARGO_BUILD_ESSENTIAL:-0} -eq 1 ]]; then
-        source "$HOME/.cargo/env"
-        cargo install eza bat fd-find ripgrep sd git-delta zoxide tealdeer cargo-cache
+    # --- OPCJONALNE: zbuduj najnowsze wersje z cargo zamiast brew -----------
+    if [[ ${MISE_TOOLS:-0} -eq 1 ]]; then
+        install_mise_tools
     fi
-    if [[ ${CARGO_BUILD_ADDITIONAL:-0} -eq 1 ]]; then
+
+    if [[ ${CARGO_BUILD:-0} -eq 1 ]]; then
         source "$HOME/.cargo/env"
+	# essential
+        cargo install eza bat fd-find ripgrep sd git-delta zoxide tealdeer cargo-cache
+	# additional
         cargo install bottom du-dust procs hyperfine tailspin yazi-fm yazi-cli xh jaq jless tokei bandwhich
     fi
 
@@ -180,8 +185,7 @@ Usage: $0 [-a] [-b] [-d] [-f] [-c] [-u] [-y]
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
   -l    LSP dla IaC w nvim: terraform-ls (tap HashiCorpa) + helm-ls
   -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
-  -c    OPCJA: zbuduj podstawowe narzedzia z cargo (najnowsze wersje)
-  -u    OPCJA: zbuduj dodatkowe narzedzia z cargo
+  -c    OPCJA DODATKOWA: zbuduj podstawowe narzedzia z cargo
   -y    Wgraj dotfiles do \$HOME
 USAGE
     exit 1
@@ -195,8 +199,8 @@ parse() {
             b ) INSTALL_BREW=1 ;;
             d ) INSTALL_DOWNLOADABLE=1 ;;
             f ) PREPARE_FISH=1 ;;
-            c ) CARGO_BUILD_ESSENTIAL=1 ;;
-            u ) CARGO_BUILD_ADDITIONAL=1 ;;
+            m ) MISE_TOOLS=1 ;;
+            c ) CARGO_BUILD=1 ;;
             y ) DEPLOY_DOTFILES=1 ;;
             \? ) usage ;;
         esac
