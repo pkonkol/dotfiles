@@ -8,6 +8,10 @@ vim.pack.add({
   "https://github.com/ThePrimeagen/vim-be-good",
 })
 
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel = 2  -- na starcie wszystko (nie)rozwinięte
+
 vim.opt.number = true
 require("precognition").toggle()
 require("hardtime").setup()

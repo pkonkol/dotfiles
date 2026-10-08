@@ -10,7 +10,7 @@ cp -i  .gitconfig              ~/
 cp -ri .config/delta           ~/.config/
 cp -i    .config/fish/config.fish    ~/.config/fish/config.fish
 cp -i  .config/wezterm/wezterm.lua ~/.config/wezterm/wezterm.lua
-cp -ri  .config/nvim/              ~/.config/     # init.lua + after/queries/
+cp -ri  .config/nvim/              ~/.config/nvim/     # init.lua + after/queries/
 
 # VS Code — CELOWO bez autokopiowania: settings.json VS Code trzyma mnostwo
 # rzeczy per-projekt i per-rozszerzenie, wiec nadpisanie go skryptem
