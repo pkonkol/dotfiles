@@ -1,6 +1,6 @@
 // ============================================================================
 //  dotfiles-settings.json
-//  NIE jest kopiowany automatycznie przez copy.sh — VS Code trzyma w
+//  NIE jest kopiowany automatycznie przez deploy.py — VS Code trzyma w
 //  settings.json mnostwo rzeczy per-projekt i per-rozszerzenie, wiec
 //  nadpisanie go skryptem gwarantuje utrate ustawien.
 //

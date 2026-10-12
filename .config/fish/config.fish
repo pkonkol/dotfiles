@@ -3,7 +3,7 @@
 #  Zasada: kazdy bajer = jedna linia. Zakomentuj -> bajer znika.
 #  Prompt nie forkuje ANI RAZU (fish przerysowuje go przy kazdym ESC w vi).
 #
-#  Wgranie:  cd ~/projects/dotfiles && ./copy.sh && exec fish
+#  Wgranie:  cd ~/projects/dotfiles && ./deploy.py && exec fish
 # ============================================================================
 
 # ============================================================================
@@ -80,11 +80,11 @@ set -g pk_rule_char '─'          # tylko dla pk_trans_style = rule
 # cieply szary #918175), wiec jako tlo albo przepalaja, albo zabijaja kolory
 # prompta. Potrzebny jest konkretny ciemny odcien, stad hex.
 # Ponizsze to oficjalne szarosci srcery (xgray2/3/4).
-# set -g pk_trans_bg 1A4873        # przygaszony srcery blue (#2C78BF scieniony)
-#set -g pk_trans_bg 2C78BF       # pelny srcery blue — mocno, ale zabija rozowy branch
+ set -g pk_trans_bg 1A4873        # przygaszony srcery blue (#2C78BF scieniony)
+ #set -g pk_trans_bg 2C78BF       # pelny srcery blue — mocno, ale zabija rozowy branch
 #set -g pk_trans_bg 1D3B53       # ciemniejszy granat
 #set -g pk_trans_bg 3A3A3A       # xgray3 — neutralna szarosc
-set -g pk_trans_bg 781814       # cieply, w strone srcery yellow (moja pochodna)
+# set -g pk_trans_bg 781814       # cieply, w strone srcery yellow (moja pochodna)
 
 # Tlo linii, ktora WLASNIE PISZESZ. Puste = brak tla, i tak ma byc:
 # podswietlanie KAZDEJ linii sprawia, ze nie widac, ktora komenda poszla.
@@ -247,10 +247,12 @@ function fish_right_prompt --description 'Cala informacja: tryb, system, host, c
     end
 
     test (count $out) -gt 0; or return
+    # Spacja z tlem tylko PRZED tekstem: prawy prompt jest wyrownany do prawej,
+    # wiec spacja na koncu przesuwalaby zegar o kolumne wzgledem zwyklych linii.
     set -l pad ''
     test (count $bg) -gt 0; and set pad ' '
     set_color normal $bg
-    printf '%s%s%s' $pad (string join (set_color normal $bg)' ' $out) $pad
+    printf '%s%s' $pad (string join (set_color normal $bg)' ' $out)
     set_color normal
 end
 
@@ -353,7 +355,10 @@ if status is-interactive
     type -q zoxide; and zoxide init fish | source          # z / zi
     type -q mise; and mise activate fish | source           # node/terraform/kubectl per projekt
     type -q fzf; and fzf --fish | source                   # nadpisuje Ctrl-R fisha
-    #type -q direnv; and direnv hook fish | source
+    # direnv hook wpisuje PELNA sciezke do binarki (/opt/homebrew/Cellar/direnv/X.Y/...).
+    # Po brew upgrade stara wersja znika i kazdy prompt sypie "Unknown command".
+    # Podmiana na sama nazwe = szukanie w PATH, przezyje upgrade.
+    type -q direnv; and direnv hook fish | string replace -r '"[^"]*/direnv"' direnv | source
 
     # kubectl/helm/gh: NIE 'xxx completion fish | source' tutaj (fork na start).
     # Raz:  kubectl completion fish > ~/.config/fish/completions/kubectl.fish

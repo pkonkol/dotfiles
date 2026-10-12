@@ -37,4 +37,17 @@ config.use_fancy_tab_bar = false
 
 --config.default_prog = { '/opt/homebrew/bin/fish', '-l' }
 
+-- ============================================================================
+--  ALT / OPTION
+--  To sa DOMYSLNE wartosci WezTerma (config/src/config.rs: left = false,
+--  right = default_true) — wpisane jawnie, zeby bylo widac, czemu Alt
+--  dziala tu, a w VS Code / tmux nie:
+--    lewy  ⌥ = Meta: program dostaje Esc+klawisz (fish Alt+E, nvim <M-x>)
+--    prawy ⌥ = sklada znaki: ą ę ś ź € §
+--  Skutek uboczny w nvim: lewy ⌥+j w insert = Esc, potem j -> wypada
+--  z insert mode. To nie blad, tak dziala Meta w terminalu.
+-- ============================================================================
+config.send_composed_key_when_left_alt_is_pressed = false
+config.send_composed_key_when_right_alt_is_pressed = true
+
 return config

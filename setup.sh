@@ -57,7 +57,7 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        ./copy.sh
+        ./deploy.py
     fi
 
     if [[ ${SETUP_UFW:-0} -eq 1 ]]; then

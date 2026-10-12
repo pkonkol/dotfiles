@@ -58,6 +58,21 @@ BREW_CLOUD=(
     #docker-desktop # na razie wgrane przez .dmg
 )
 
+# --- Serwery LSP dla nvim (wlaczone w .config/nvim/init.lua) -----------------
+BREW_LSP=(
+    lua-language-server           # lua_ls
+    bash-language-server          # bashls          (npm)
+    fish-lsp                      # fish_lsp        (npm)
+    yaml-language-server          # yamlls          (npm)
+    helm-ls                       # helm_ls
+    markdown-oxide                # markdown_oxide
+    vscode-langservers-extracted  # jsonls          (npm)
+    taplo                         # taplo
+    dockerfile-language-server    # dockerls        (npm)
+    typescript-language-server    # ts_ls           (npm, + typescript)
+    terraform-ls                  # terraformls
+)
+
 # --- Dev / wersje runtimeow --------------------------------------------------
 BREW_DEV=(
     git-delta lazygit gh
@@ -88,7 +103,7 @@ install_ioskeley() {
     echo "==> Ioskeley Mono Term Nerd Font"
     local url
     url="$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
-          | grep -o "https://[^\"]*${asset}" | head -1)"
+          | grep -o "https://[^\"]*${asset}" | head -1 || true)"
     if [[ -z "$url" ]]; then
         echo "    !! nie znalazlem ${asset} w najnowszym release"
         echo "    !! pobierz recznie: https://github.com/${repo}/releases"
@@ -109,13 +124,6 @@ install_mise_tools() {
     mise use -g node@lts
 }
 
-install_iac_lsp() {
-    brew tap hashicorp/tap
-    brew install hashicorp/tap/terraform-ls
-    brew install helm-ls 2>/dev/null || \
-        echo "!! helm-ls nie w core — sprawdz 'brew search helm-ls' albo: go install github.com/mrjosh/helm-ls@latest"
-}
-
 main() {
     parse "$@"
 
@@ -123,11 +131,12 @@ main() {
         command -v brew >/dev/null 2>&1 || \
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
+        # || — jeden zepsuty pakiet nie ubija calego skryptu; bledy widac wyzej
         brew install "${BREW_CORE[@]}" "${BREW_MODERN[@]}" "${BREW_COLOR[@]}" \
-                     "${BREW_DEV[@]}" "${BREW_MISC[@]}" "${BREW_CLOUD[@]}"
-        brew install --cask "${BREW_CASKS[@]}"
+                     "${BREW_DEV[@]}" "${BREW_MISC[@]}" "${BREW_CLOUD[@]}" \
+                     "${BREW_LSP[@]}" || echo "!! brew: czesc pakietow sie nie zainstalowala"
+        brew install --cask "${BREW_CASKS[@]}" || echo "!! brew cask: blad"
         install_mise_tools
-        install_iac_lsp
     fi
 
     if [[ ${INSTALL_DOWNLOADABLE:-0} -eq 1 ]]; then
@@ -172,7 +181,7 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        ./copy.sh
+        ./deploy.py
     fi
 }
 
@@ -183,7 +192,6 @@ Usage: $0 [-a] [-b] [-d] [-f] [-c] [-u] [-y]
   -b    Pakiety Homebrew (to jest jedyne co realnie potrzebne na macOS)
   -d    Pobierane rzeczy (tpm, rustup)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
-  -l    LSP dla IaC w nvim: terraform-ls (tap HashiCorpa) + helm-ls
   -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
   -c    OPCJA DODATKOWA: zbuduj podstawowe narzedzia z cargo
   -y    Wgraj dotfiles do \$HOME
@@ -193,7 +201,7 @@ USAGE
 
 parse() {
     [[ $# -eq 0 ]] && usage
-    while getopts "abdfmlcuy" opt; do
+    while getopts "abdfmcuy" opt; do
         case ${opt} in
             a ) INSTALL_BREW=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; MISE_TOOLS=1; DEPLOY_DOTFILES=1 ;;
             b ) INSTALL_BREW=1 ;;
