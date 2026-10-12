@@ -38,10 +38,7 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 -- ===========================================================================
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "zgas podswietlenie wyszukiwania" })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "wyjdz z trybu terminala" })
-vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "okno w lewo" })
-vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "okno w dol" })
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "okno w gore" })
-vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "okno w prawo" })
+-- Ctrl+h/j/k/l = okno w lewo/dol/gore/prawo — patrz vim-tmux-navigator w BAZIE
 
 -- Mignij skopiowanym tekstem — widac, CO dokladnie poszlo do rejestru
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -82,6 +79,7 @@ vim.pack.add({
   gh("tris203/precognition.nvim"),
   gh("ThePrimeagen/vim-be-good"),
   gh("stevearc/aerial.nvim"),
+  gh("christoomey/vim-tmux-navigator"),
 })
 
 vim.opt.foldmethod = "expr"
@@ -97,6 +95,16 @@ require("aerial").setup()
 vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<cr>", { desc = "aerial: spis symboli" })
 
 vim.cmd.colorscheme("srcery")
+
+-- vim-tmux-navigator — 6.3k★. Ctrl+h/j/k/l przechodzi miedzy oknami nvima,
+-- a na krawedzi przeskakuje do sasiedniego panelu tmuxa (druga polowa siedzi
+-- w .tmux.conf jako plugin tpm). Poza tmuxem dziala jak zwykle Ctrl+w h/j/k/l.
+-- Skroty ustawiamy sami, bez domyslnego Ctrl+\ (poprzedni panel).
+vim.g.tmux_navigator_no_mappings = 1
+vim.keymap.set("n", "<C-h>", "<cmd>TmuxNavigateLeft<cr>",  { desc = "okno/panel tmux w lewo" })
+vim.keymap.set("n", "<C-j>", "<cmd>TmuxNavigateDown<cr>",  { desc = "okno/panel tmux w dol" })
+vim.keymap.set("n", "<C-k>", "<cmd>TmuxNavigateUp<cr>",    { desc = "okno/panel tmux w gore" })
+vim.keymap.set("n", "<C-l>", "<cmd>TmuxNavigateRight<cr>", { desc = "okno/panel tmux w prawo" })
 
 -- ===========================================================================
 --  [P] PODPOWIEDZI SKOKOW W KOLUMNIE ZNAKOW — dopelnienie precognition

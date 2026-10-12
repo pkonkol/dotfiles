@@ -385,6 +385,7 @@ alias lt   'eza --icons --group-directories-first --sort modified --tree --level
 alias tree 'eza --icons --tree'
 alias kubectl 'kubecolor'
 
+abbr -a l ls
 abbr -a g git
 abbr -a gs 'git status'
 abbr -a gd 'git diff'
