@@ -385,8 +385,10 @@ alias lt   'eza --icons --group-directories-first --sort modified --tree --level
 alias tree 'eza --icons --tree'
 alias kubectl 'kubecolor'
 
+
 abbr -a l ls
 abbr -a g git
+abbr -a gfa 'git fetch --all'
 abbr -a gs 'git status'
 abbr -a gd 'git diff'
 abbr -a ga 'git add'
@@ -398,7 +400,7 @@ abbr -a lg lazygit
 abbr -a k    kubectl
 abbr -a kgp  'kubectl get pods'
 abbr -a kgs  'kubectl get svc'
-abbr -a kgn  'kubectl get nodes'
+abbr -a kgn 'kubectl get nodes -L eks.amazonaws.com/nodegroup,node.kubernetes.io/instance-type,topology.kubernetes.io/zone'
 abbr -a kd   'kubectl describe'
 abbr -a kl   'kubectl logs -f'
 
