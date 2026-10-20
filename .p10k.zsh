@@ -21,7 +21,7 @@ source /opt/homebrew/share/powerlevel10k/config/p10k-lean.zsh
   )
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 
-  # --- po Enter zostaje sam znak zachety (jak transient w config.fish) ---
+  # --- po Enter zostaje sam znak zachety; tlo dorysowuje _pk_transient_bg w .zshrc ---
   typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
   typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 

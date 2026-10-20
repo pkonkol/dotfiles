@@ -41,6 +41,7 @@ HISTFILE=~/.zsh_history
 HISTSIZE=100000
 SAVEHIST=100000
 setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS
+setopt EXTENDED_HISTORY       # czas wykonania w historii, jak `when:` w fishu
 setopt HIST_VERIFY            # !! !$ !* najpierw rozwijaja sie w linii, Enter dopiero odpala
 setopt AUTO_CD INTERACTIVE_COMMENTS NO_BEEP EXTENDED_GLOB
 
@@ -49,12 +50,42 @@ autoload -Uz compinit
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then compinit; else compinit -C; fi
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'   # bez rozrozniania wielkosci liter
 zstyle ':completion:*' menu select
+# menu pod Tab jak pager fisha: kolory plikow, grupy z naglowkami, opisy opcji
+zstyle ':completion:*:default' list-colors ''   # '' = domyslne kolory zsh (katalogi, linki, exec)
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%F{11}-- %d --%f'
+zstyle ':completion:*:messages' format '%F{13}-- %d --%f'
+zstyle ':completion:*:warnings' format '%F{9}-- brak dopasowan: %d --%f'
+zstyle ':completion:*' use-cache on   # wolne completion (brew, pip) z cache w ~/.zcompcache
 
 # ============================================================================
 #  PROMPT  (szablon lean z brew + nadpisania w ~/.p10k.zsh)
 # ============================================================================
 source $BREW/share/powerlevel10k/powerlevel10k.zsh-theme
 source ~/.p10k.zsh
+
+# Tlo transient promptu jak w config.fish: wykonana komenda dostaje niebieskie
+# tlo na cala szerokosc = wyrazny separator w scrollbacku. p10k zostawia juz
+# '❯ komenda'; preexec wraca kursorem na te linie i rysuje je ponownie z tlem.
+# Ponownie rysowana komenda traci kolory skladni.
+PK_TRANSIENT_BG='#1A4873'   # przygaszony srcery blue
+_pk_transient_bg() {
+  local -i last_status=$? rows=0 width
+  local line
+  for line in "${(@f)1}"; do
+    width=${(m)#line}
+    (( rows )) || width+=2               # '❯ ' tylko w pierwszej linii
+    rows+=$(( width / COLUMNS + 1 ))
+  done
+  local char_color=10
+  (( last_status )) && char_color=9
+  print -Pn "%{\e[${rows}A\r%}%K{$PK_TRANSIENT_BG}%B%F{$char_color}❯%f%b "
+  print -rn -- "${1//$'\n'/$'\e[K\n'}"
+  print -Pn '\e[K%k\n'
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec _pk_transient_bg
 
 # ============================================================================
 #  VI MODE  (zsh-vi-mode: text objects, surround, `.`, liczniki, vv -> nvim)
@@ -77,8 +108,13 @@ source $BREW/opt/fzf/shell/completion.zsh   # ** + Tab
 # ============================================================================
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"   # z / zi
 
-# Recznie, tylko w tym oknie. Oba hooki odpalaja proces przed KAZDYM promptem:
-# mise ~200 ms, direnv ~18 ms (zsh-bench: command_lag 26 ms -> 7 ms bez direnv).
+# ----------------------------------------------------------------------------
+#  WLACZANE RECZNIE, tylko w biezacym oknie:
+#    mise-on     wersje z mise.toml projektu (globalne sa zawsze w PATH, patrz gora)
+#    direnv-on   .envrc przy kazdym cd
+#  Oba hooki odpalaja proces przed KAZDYM promptem: mise ~200 ms, direnv ~18 ms
+#  (zsh-bench: command_lag 26 ms -> 7 ms bez direnv).
+# ----------------------------------------------------------------------------
 alias mise-on='eval "$(mise activate zsh)"'
 alias direnv-on='eval "$(direnv hook zsh)"'
 
@@ -111,5 +147,7 @@ cht() { xh -b "cht.sh/$1" User-Agent:curl }
 # ============================================================================
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'   # brblack, jak fish_color_autosuggestion
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1          # bez przepinania widgetow przy kazdym prompcie
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # gdy historia nic nie ma, podpowiedz z completion (jak fish)
+ZSH_AUTOSUGGEST_USE_ASYNC=1              # completion liczone w tle, pisanie nie czeka
 source $BREW/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $BREW/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
