@@ -47,6 +47,13 @@
   "telemetry.telemetryLevel": "off",
   "update.showReleaseNotes": false,
 
+  // --- NEOVIM (asvetliakov.vscode-neovim) ----------------------------------
+  // Osobny init bez UI-pluginow. Sciezka idzie wprost do `nvim -u`, bez
+  // shella, wiec ~ nie jest rozwijane.
+  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/piotr.konkol/.config/nvim/init-vscode.lua",
+  // vscode-neovim w osobnym extension host — pisanie nie czeka na inne rozszerzenia
+  "extensions.experimental.affinity": { "asvetliakov.vscode-neovim": 1 },
+
   // --- GIT -----------------------------------------------------------------
   "git.autofetch": true,
   "git.confirmSync": false,
