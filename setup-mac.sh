@@ -126,18 +126,11 @@ install_mise_tools() {
     mise use -g node@lts
 }
 
-# Skille Claude Code: plugin "pk" -> /pk:<skill>. Zrodlo w dotfiles/pk-skills (.gitignore),
-# ~/.claude/skills/pk to symlink; Claude Code laduje go jako pk@skills-dir.
+# Skille Claude Code: plugin "pk" -> /pk:<skill>. Zrodlo w dotfiles/pk-skills (.gitignore).
+# Symlinki ~/.claude/skills/pk i ~/.claude/rules/pk-*.md robi dotter (-y, pakiet mac).
 # Prywatne repo: git zapyta o login i token (credential.helper=store).
 install_pk_skills() {
-    local dir="$PWD/pk-skills" link="$HOME/.claude/skills/pk"
-    [[ -d "$dir" ]] || git clone https://github.com/pkonkol/pk-skills.git "$dir"
-    if [[ -e "$link" && ! -L "$link" ]]; then
-        echo "!! $link to zwykly katalog, nie symlink: przenies zmiany do $dir i usun go"; return 1
-    fi
-    mkdir -p "$(dirname "$link")"
-    ln -sfn "$dir" "$link"
-    /usr/bin/python3 "$dir/scripts/deploy.py" --apply   # reguly pk -> symlinki w ~/.claude/rules
+    [[ -d pk-skills ]] || git clone https://github.com/pkonkol/pk-skills.git pk-skills
 }
 
 main() {

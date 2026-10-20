@@ -17,6 +17,9 @@ depends = ["common"]
 
 [mac.files]
 ".tmux.conf" = "~/.tmux.conf"
+# pk-skills is a separate repo cloned here by setup-mac.sh -d (gitignored); Claude Code loads it as plugin pk@skills-dir
+"pk-skills" = { target = "~/.claude/skills/pk", type = "symbolic", recurse = false }
+"pk-skills/rules" = "~/.claude/rules"   # per-file links, other files in ~/.claude/rules stay untouched
 
 [linux]
 depends = ["common"]
