@@ -1,14 +1,6 @@
 // ============================================================================
-//  dotfiles-settings.json
-//  NIE jest kopiowany automatycznie przez deploy.py — VS Code trzyma w
-//  settings.json mnostwo rzeczy per-projekt i per-rozszerzenie, wiec
-//  nadpisanie go skryptem gwarantuje utrate ustawien.
-//
-//  Dwa sposoby na wgranie:
-//    1) Recznie: Cmd+Shift+P -> "Preferences: Open User Settings (JSON)"
-//       i wklej potrzebne klucze.
-//    2) Skryptem scalajacym (robi backup):
-//       ./.config/vscode/merge-settings.sh
+//  10-base.jsonc — wspolne ustawienia VS Code dla kazdego profilu.
+//  Fragmenty z tego katalogu scala do profili: just vscode <profil>...
 // ============================================================================
 {
   // --- TERMINAL ------------------------------------------------------------
@@ -46,13 +38,6 @@
   "breadcrumbs.enabled": true,
   "telemetry.telemetryLevel": "off",
   "update.showReleaseNotes": false,
-
-  // --- NEOVIM (asvetliakov.vscode-neovim) ----------------------------------
-  // Osobny init bez UI-pluginow. Sciezka idzie wprost do `nvim -u`, bez
-  // shella, wiec ~ nie jest rozwijane.
-  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/piotr.konkol/.config/nvim/init-vscode.lua",
-  // vscode-neovim w osobnym extension host — pisanie nie czeka na inne rozszerzenia
-  "extensions.experimental.affinity": { "asvetliakov.vscode-neovim": 1 },
 
   // --- GIT -----------------------------------------------------------------
   "git.autofetch": true,

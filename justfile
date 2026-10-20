@@ -17,6 +17,6 @@ setup *flags:
 setup *flags:
     bash setup.sh {{ flags }}
 
-# scal dotfiles-settings.json do settings.json VS Code (z backupem)
-vscode:
-    .config/vscode/merge-settings.sh
+# scal .config/vscode/settings/*.jsonc do profili VS Code (z backupem), np. just vscode dotfiles aiboostr
+vscode +profiles:
+    .config/vscode/merge-settings.py {{ profiles }}

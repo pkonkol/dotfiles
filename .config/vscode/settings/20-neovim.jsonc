@@ -1,0 +1,34 @@
+// ============================================================================
+//  20-neovim.jsonc — vscode-neovim + which-key (VSpaceCode.whichkey).
+//  Wymaga rozszerzen: asvetliakov.vscode-neovim, VSpaceCode.whichkey.
+//  Spacja w normal mode (init-vscode.lua) otwiera menu ponizej. Klawisze jak
+//  <leader> w init.lua; zamiast fzf-lua, aerial, neo-tree — komendy VS Code.
+// ============================================================================
+{
+  // Osobny init bez UI-pluginow. Sciezka idzie wprost do `nvim -u`, bez
+  // shella, wiec ~ nie jest rozwijane.
+  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/piotr.konkol/.config/nvim/init-vscode.lua",
+  // vscode-neovim w osobnym extension host — pisanie nie czeka na inne rozszerzenia
+  "extensions.experimental.affinity": { "asvetliakov.vscode-neovim": 1 },
+  // Przewijaniem rzadzi VS Code, nie nvim: to jest odpowiednik scrolloff=10 z init.lua
+  "editor.cursorSurroundingLines": 10,
+
+  // Cala lista zastepuje domyslne menu VSpaceCode (styl Spacemacsa)
+  "whichkey.bindings": [
+    { "key": " ", "name": "szukaj wszystkiego (Cmd+P)", "type": "command", "command": "workbench.action.quickOpen" },
+    { "key": "?", "name": "szukaj w tym menu", "type": "command", "command": "whichkey.searchBindings" },
+    { "key": "a", "name": "spis symboli (Outline)", "type": "command", "command": "outline.focus" },
+    { "key": "e", "name": "plik w drzewie", "type": "command", "command": "workbench.files.action.showActiveFileInExplorer" },
+    { "key": "E", "name": "pokaz/ukryj panel boczny", "type": "command", "command": "workbench.action.toggleSidebarVisibility" },
+    { "key": "q", "name": "wszystkie bledy (Problems)", "type": "command", "command": "workbench.actions.view.problems" },
+    { "key": "f", "name": "+find", "type": "bindings", "bindings": [
+      { "key": "f", "name": "pliki", "type": "command", "command": "workbench.action.quickOpen" },
+      { "key": "g", "name": "grep na zywo", "type": "command", "command": "workbench.action.quickTextSearch" },
+      { "key": "G", "name": "grep w panelu Search", "type": "command", "command": "workbench.action.findInFiles" },
+      { "key": "b", "name": "otwarte edytory", "type": "command", "command": "workbench.action.showAllEditors" },
+      { "key": "o", "name": "ostatnie pliki i foldery", "type": "command", "command": "workbench.action.openRecent" },
+      { "key": "k", "name": "wszystkie skroty", "type": "command", "command": "workbench.action.openGlobalKeybindings" },
+      { "key": "r", "name": "wznow ostatnie szukanie", "type": "command", "command": "workbench.view.search" }
+    ] }
+  ]
+}

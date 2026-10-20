@@ -5,7 +5,8 @@
 --  VS Code rysuje tekst i caly interfejs, nvim tylko edytuje bufor. Okna,
 --  popupy i virtual text nvima nie sa wyswietlane, wiec which-key, fzf-lua,
 --  aerial, neo-tree, precognition i colorscheme tu nie dzialaja. Zamiast nich
---  te same klawisze co w init.lua wolaja odpowiednik z VS Code.
+--  te same klawisze co w init.lua wolaja odpowiednik z VS Code, a <leader>
+--  otwiera menu VSpaceCode.whichkey.
 --
 --  Bez kodu, z vscode-neovim: K gd gD gO gh, wbudowane grr grn gra gri
 --  (vim.lsp.buf przekierowany do VS Code), Ctrl+w s/v/q/o (edytory VS Code).
@@ -44,28 +45,20 @@ require("pk.textobjects")
 local function code(command) return function() vscode.action(command) end end
 local function map(lhs, command, desc) vim.keymap.set("n", lhs, code(command), { desc = desc }) end
 
--- [3] fzf-lua -> Quick Open / Quick Search
-map("<leader><leader>", "workbench.action.quickOpen",            "szukaj wszystkiego (Cmd+P)")
-map("<leader>ff",       "workbench.action.quickOpen",            "pliki")
-map("<leader>fg",       "workbench.action.quickTextSearch",      "grep na zywo")
-map("<leader>fG",       "workbench.action.findInFiles",          "grep w panelu Search")
-map("<leader>fb",       "workbench.action.showAllEditors",       "otwarte edytory")
-map("<leader>fo",       "workbench.action.openRecent",           "ostatnie pliki i foldery")
-map("<leader>fk",       "workbench.action.openGlobalKeybindings", "wszystkie skroty")
-map("<leader>fs",       "workbench.action.showAllSymbols",       "symbole w projekcie")
+-- [1] which-key + [3] fzf-lua -> menu VSpaceCode.whichkey. Cala zawartosc
+--     menu (<leader>ff, fg, a, e, q...) siedzi w .config/vscode/settings/20-neovim.jsonc.
+map("<leader>", "whichkey.show", "menu which-key")
 
--- [1] which-key -> Command Palette (przy kazdej komendzie widac jej skrot)
-map("<leader>?", "workbench.action.showCommands", "lista komend")
-
--- aerial -> Outline;  neo-tree -> Explorer
-map("<leader>a", "outline.focus",                                 "spis symboli (Outline)")
-map("<leader>e", "workbench.files.action.showActiveFileInExplorer", "plik w drzewie")
-map("<leader>E", "workbench.action.toggleSidebarVisibility",       "pokaz/ukryj panel boczny")
+-- Foldy rysuje VS Code; vscode-neovim wylacza foldy nvima i nie mapuje z*
+map("zc", "editor.fold",       "zwin")
+map("zo", "editor.unfold",     "rozwin")
+map("za", "editor.toggleFold", "przelacz zwiniecie")
+map("zM", "editor.foldAll",    "zwin wszystko")
+map("zR", "editor.unfoldAll",  "rozwin wszystko")
 
 -- Diagnostyka: nvim w VS Code nie ma LSP, wiec ]d [d ida do Problems
 map("]d",        "editor.action.marker.next",        "nastepny blad")
 map("[d",        "editor.action.marker.prev",        "poprzedni blad")
-map("<leader>q", "workbench.actions.view.problems",  "wszystkie bledy (Problems)")
 
 -- vim-tmux-navigator -> grupy edytorow i panele VS Code
 map("<C-h>", "workbench.action.navigateLeft",  "panel w lewo")
