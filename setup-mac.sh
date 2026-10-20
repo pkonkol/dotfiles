@@ -7,6 +7,7 @@ BREW_CORE=(
     coreutils          # gnu ls/date/... jako g-prefixed
     curl wget
     tree-sitter-cli
+    dotter             # symlinki dotfiles (-y)
 )
 
 # --- Nowoczesne zamienniki klasykow (wiekszosc w Rust) ----------------------
@@ -196,7 +197,8 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        ./deploy.py
+        [[ -f .dotter/local.toml ]] || echo 'packages = ["mac"]' > .dotter/local.toml
+        dotter deploy
     fi
 }
 
@@ -209,7 +211,7 @@ Usage: $0 [-a] [-b] [-d] [-f] [-m] [-c] [-y]
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
   -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
   -c    OPCJA DODATKOWA: zbuduj podstawowe narzedzia z cargo
-  -y    Wgraj dotfiles do \$HOME
+  -y    Podlinkuj dotfiles do \$HOME (dotter, pakiet mac)
 USAGE
     exit 1
 }

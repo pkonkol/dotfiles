@@ -1,0 +1,26 @@
+[settings]
+default_target_type = "symbolic"   # init.lua contains `{{`; automatic mode would turn it into a copied template
+
+[common.files]
+".gitconfig" = "~/.gitconfig"
+".gitconfig-personal" = "~/.gitconfig-personal"
+".config/delta" = "~/.config/delta"
+".config/bat" = "~/.config/bat"
+".config/fish/config.fish" = "~/.config/fish/config.fish"
+".config/wezterm/wezterm.lua" = "~/.config/wezterm/wezterm.lua"
+# one link for the whole dir so files nvim writes (nvim-pack-lock.json) land in the repo;
+# never add entries for paths inside .config/nvim: with --force dotter deletes them from the repo (dotter#218)
+".config/nvim" = { target = "~/.config/nvim", type = "symbolic", recurse = false }
+
+[mac]
+depends = ["common"]
+
+[mac.files]
+".tmux.conf" = "~/.tmux.conf"
+
+[linux]
+depends = ["common"]
+
+[linux.files]
+".tmux.homelab.conf" = "~/.tmux.conf"
+".config/nix" = "~/.config/nix"

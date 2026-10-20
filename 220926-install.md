@@ -14,10 +14,12 @@ git clone <to-repo> ~/projects/dotfiles && cd ~/projects/dotfiles
 exec fish
 ```
 
-**Po KAŻDEJ zmianie w repo** (to jest ten krok, o którym się zapomina):
+**Pliki w `$HOME` to symlinki do repo** (Dotter, mapowanie w `.dotter/global.toml`).
+Edycja w `$HOME` i w repo to ta sama zmiana. `dotter deploy` tylko po dodaniu
+nowego pliku do mapowania:
 
 ```bash
-cd ~/projects/dotfiles && ./deploy.py && exec fish
+cd ~/projects/dotfiles && dotter deploy && exec fish
 ```
 
 Opcjonalnie, gdy chcesz najnowsze wersje budowane u siebie:
@@ -235,7 +237,7 @@ cudzysłów, `if` bez `end`) nie dostaje paska.
 
 **Pułapka przy wgrywaniu:** plik `~/.config/fish/functions/fish_prompt.fish`
 ma **pierwszeństwo** nad definicją w `config.fish`. Stara kopia cicho nadpisze
-nowy prompt. `deploy.py` ostrzega, gdy taki plik istnieje.
+nowy prompt. Usuń starą kopię.
 
 Zmierz prompt po zmianach:
 
@@ -246,8 +248,8 @@ fish --profile-startup /tmp/p.log -i -c exit; sort -t' ' -k2 -rn /tmp/p.log | he
 
 ## 3b. VS Code
 
-`.config/vscode/dotfiles-settings.json` **celowo nie jest kopiowany** przez
-`deploy.py`. VS Code trzyma w `settings.json` mnóstwo rzeczy per-projekt
+`.config/vscode/dotfiles-settings.json` **celowo nie jest w mapowaniu**
+Dottera. VS Code trzyma w `settings.json` mnóstwo rzeczy per-projekt
 i per-rozszerzenie — nadpisanie go skryptem gwarantuje utratę ustawień.
 
 Dwa sposoby wgrania:

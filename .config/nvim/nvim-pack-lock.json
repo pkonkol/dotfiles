@@ -1,0 +1,92 @@
+{
+  "plugins": {
+    "LuaSnip": {
+      "rev": "0abc8f390b278c3b4aabc4c004ac8a088b65cf24",
+      "src": "https://github.com/L3MON4D3/LuaSnip"
+    },
+    "aerial.nvim": {
+      "rev": "28fe6e822ae344544c379d60fcb13c9519a1f08a",
+      "src": "https://github.com/stevearc/aerial.nvim"
+    },
+    "flash.nvim": {
+      "rev": "5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a",
+      "src": "https://github.com/folke/flash.nvim"
+    },
+    "fzf-lua": {
+      "rev": "348df165f1773dd08c5d710add3fd0db6d421e6a",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "hardtime.nvim": {
+      "rev": "721a75b9a0c2eb1fb811d34507708ee315cb04eb",
+      "src": "https://github.com/m4xshen/hardtime.nvim"
+    },
+    "mini.operators": {
+      "rev": "0e25aac29dd6cdbcfdbd8a6505a8e3be5064ef1a",
+      "src": "https://github.com/echasnovski/mini.operators"
+    },
+    "neo-tree.nvim": {
+      "rev": "f3f3bf73414e400cf9fc13fda50f00404a8f8ab1",
+      "src": "https://github.com/nvim-neo-tree/neo-tree.nvim",
+      "version": ">=0.0.0"
+    },
+    "nui.nvim": {
+      "rev": "10fc361835c856ba4233ef5ea135b919bf3dce97",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
+    },
+    "nvim-lspconfig": {
+      "rev": "45a3a444b710511c39abca3b60bb6e23a21e3de5",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-surround": {
+      "rev": "2e93e154de9ff326def6480a4358bfc149d5da2c",
+      "src": "https://github.com/kylechui/nvim-surround",
+      "version": "4.0.0 - 5.0.0"
+    },
+    "nvim-treesitter": {
+      "rev": "29212d826054bb2948fa9d3a99eca9bf6a050eb2",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
+    "nvim-treesitter-textobjects": {
+      "rev": "5c7b0263797dfd1bd6202f2b219f3b53a80b2187",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+      "version": "'main'"
+    },
+    "nvim-web-devicons": {
+      "rev": "ec309a0eaff6ea967e58c275996155ab5c16938d",
+      "src": "https://github.com/nvim-tree/nvim-web-devicons"
+    },
+    "plenary.nvim": {
+      "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
+      "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "precognition.nvim": {
+      "rev": "af99323ea0942aac39b65dca2bac7bb1174c010f",
+      "src": "https://github.com/tris203/precognition.nvim"
+    },
+    "srcery-vim": {
+      "rev": "ae584b8320c6e74bd37ca908e45026163c086628",
+      "src": "https://github.com/srcery-colors/srcery-vim"
+    },
+    "tokyonight.nvim": {
+      "rev": "cdc07ac78467a233fd62c493de29a17e0cf2b2b6",
+      "src": "https://github.com/folke/tokyonight.nvim"
+    },
+    "vim-be-good": {
+      "rev": "0ae3de14eb8efc6effe7704b5e46495e91931cc5",
+      "src": "https://github.com/ThePrimeagen/vim-be-good"
+    },
+    "vim-tmux-navigator": {
+      "rev": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432",
+      "src": "https://github.com/christoomey/vim-tmux-navigator"
+    },
+    "which-key.nvim": {
+      "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
+      "src": "https://github.com/folke/which-key.nvim"
+    },
+    "yanky.nvim": {
+      "rev": "adcabd8512bead30184916fa9277e73c021ef099",
+      "src": "https://github.com/gbprod/yanky.nvim"
+    }
+  }
+}

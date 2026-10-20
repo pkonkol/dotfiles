@@ -1,2 +1,7 @@
 # osobne repo pk-skills (skille Claude Code), klonowane przez setup-mac.sh -d
 pk-skills/
+
+# dotter: per-machine package choice and deploy cache
+.dotter/local.toml
+.dotter/cache.toml
+.dotter/cache/

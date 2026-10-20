@@ -34,8 +34,18 @@ main() {
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         # mise — wersje runtimeow (w apt go nie ma)
         curl https://mise.run | sh
-        # uv — potrzebny do ./deploy.py (w apt go nie ma)
+        # uv (w apt go nie ma)
         curl -LsSf https://astral.sh/uv/install.sh | sh
+        # dotter — symlinki dotfiles dla -y; gotowa binarka, bez kompilacji
+        case "$(uname -m)" in
+            x86_64)  dotter_arch=x64 ;;
+            aarch64) dotter_arch=arm64 ;;
+            *) echo "!! dotter: brak binarki dla $(uname -m)"; exit 1 ;;
+        esac
+        mkdir -p ~/.local/bin
+        curl -fsSL -o ~/.local/bin/dotter \
+            "https://github.com/SuperCuber/dotter/releases/download/v0.13.5/dotter-linux-${dotter_arch}-musl"
+        chmod +x ~/.local/bin/dotter
     fi
 
     if [[ ${PREPARE_FISH:-0} -eq 1 ]]; then
@@ -62,8 +72,9 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        export PATH="$HOME/.local/bin:$PATH"   # tu laduja uv i mise z -d
-        ./deploy.py --homelab
+        export PATH="$HOME/.local/bin:$PATH"   # tu laduja uv, mise i dotter z -d
+        [[ -f .dotter/local.toml ]] || echo 'packages = ["linux"]' > .dotter/local.toml
+        dotter deploy
     fi
 
     if [[ ${SETUP_UFW:-0} -eq 1 ]]; then
@@ -82,12 +93,12 @@ usage() {
 Usage: $0 [-a] [-i] [-d] [-f] [-c] [-u] [-w] [-y]
   -a    Wszystko
   -i    Pakiety apt
-  -d    Pobierane rzeczy (fonty, tpm, rustup, mise, uv)
+  -d    Pobierane rzeczy (fonty, tpm, rustup, mise, uv, dotter)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
   -c    Zbuduj podstawowe narzedzia z cargo (zalecane: apt ma stare wersje)
   -u    Zbuduj dodatkowe narzedzia z cargo
   -w    Skonfiguruj UFW
-  -y    Wgraj dotfiles do \$HOME
+  -y    Podlinkuj dotfiles do \$HOME (dotter, pakiet linux)
 USAGE
     exit 1
 }
