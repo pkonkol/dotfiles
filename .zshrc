@@ -47,7 +47,8 @@ setopt AUTO_CD INTERACTIVE_COMMENTS NO_BEEP EXTENDED_GLOB
 
 # compinit z cache: pelny skan najwyzej raz na dobe, poza tym -C (bez sprawdzania)
 autoload -Uz compinit
-if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then compinit; else compinit -C; fi
+# touch: compinit nie przepisuje niezmienionego dumpa, bez tego pelny skan szedlby przy kazdym starcie
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then compinit; touch ~/.zcompdump; else compinit -C; fi
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'   # bez rozrozniania wielkosci liter
 zstyle ':completion:*' menu select
 # menu pod Tab jak pager fisha: kolory plikow, grupy z naglowkami, opisy opcji
@@ -62,6 +63,8 @@ zstyle ':completion:*' use-cache on   # wolne completion (brew, pip) z cache w ~
 # ============================================================================
 #  PROMPT  (szablon lean z brew + nadpisania w ~/.p10k.zsh)
 # ============================================================================
+# laptop, nie serwer: bez tego p10k sprawdza SSH przez `who am i` (fork, ~11 ms)
+[[ -z $SSH_CONNECTION ]] && typeset -gx P9K_SSH=0 _P9K_SSH_TTY=$TTY
 source $BREW/share/powerlevel10k/powerlevel10k.zsh-theme
 source ~/.p10k.zsh
 
@@ -157,7 +160,10 @@ alias tsl='just state-local' tsr='just state-remote'
 # ============================================================================
 #  PLUGINY NA KONCU  (kolejnosc z README: syntax-highlighting, potem substring-search)
 # ============================================================================
+# plugin bierze kolory z 5x $(tput ...) = 5 forkow (~40 ms); echoti to to samo wbudowane w zsh
+tput() { echoti "$@" }
 source $BREW/share/zsh-you-should-use/you-should-use.plugin.zsh   # "masz alias gs"
+unfunction tput
 add-zsh-hook -d preexec _check_git_aliases   # bez aliasow z .gitconfig: forkuje git+sort (~20 ms) przed kazdym `git ...`
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'   # brblack, jak fish_color_autosuggestion
