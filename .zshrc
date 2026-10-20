@@ -99,6 +99,11 @@ zvm_after_init() {
   bindkey -M viins '^F' autosuggest-accept      # jak ctrl-f w config.fish
   bindkey -M viins '^[e' zvm_vi_edit_command_line   # Alt-e jak w fishu
   bindkey -M vicmd '^[e' zvm_vi_edit_command_line
+  # strzalka / k j: historia z wpisanym fragmentem, jak w fishu
+  bindkey -M viins '^[[A' history-substring-search-up
+  bindkey -M viins '^[[B' history-substring-search-down
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
 }
 source $BREW/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 source $BREW/opt/fzf/shell/completion.zsh   # ** + Tab
@@ -141,13 +146,24 @@ alias tf=terraform tfi='terraform init' tfp='terraform plan' tfa='terraform appl
 alias awsp='aws --profile' awsw='aws sts get-caller-identity'
 
 cht() { xh -b "cht.sh/$1" User-Agent:curl }
+mkcd() { mkdir -p "$1" && cd "$1" }
+mkvi() { mkdir -p "${1:h}" && nvim "$1" }
+upn() { local up_path=''; repeat $1 up_path+='../'; print "cd $up_path" }   # upn 3 -> cd ../../../
+
+# lokalny tfstate w cloudboostr-ai-ecosystem/dev.justfile
+alias tsp='just state-pull' tsm='just state-mv' tsls='just state-list'
+alias tsl='just state-local' tsr='just state-remote'
 
 # ============================================================================
-#  PLUGINY NA KONCU  (syntax-highlighting musi byc ostatni)
+#  PLUGINY NA KONCU  (kolejnosc z README: syntax-highlighting, potem substring-search)
 # ============================================================================
+source $BREW/share/zsh-you-should-use/you-should-use.plugin.zsh   # "masz alias gs"
+add-zsh-hook -d preexec _check_git_aliases   # bez aliasow z .gitconfig: forkuje git+sort (~20 ms) przed kazdym `git ...`
+
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'   # brblack, jak fish_color_autosuggestion
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1          # bez przepinania widgetow przy kazdym prompcie
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # gdy historia nic nie ma, podpowiedz z completion (jak fish)
 ZSH_AUTOSUGGEST_USE_ASYNC=1              # completion liczone w tle, pisanie nie czeka
 source $BREW/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $BREW/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $BREW/share/zsh-history-substring-search/zsh-history-substring-search.zsh

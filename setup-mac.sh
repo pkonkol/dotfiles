@@ -11,6 +11,16 @@ BREW_CORE=(
     just               # justfile w repo: just deploy / setup / vscode
 )
 
+# --- zsh: pluginy, ktore .zshrc wczytuje z /opt/homebrew/share ---------------
+BREW_ZSH=(
+    powerlevel10k
+    zsh-vi-mode
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    zsh-history-substring-search   # strzalka w gore / k szuka fragmentu, jak fish
+    zsh-you-should-use             # przypomina alias, gdy wpiszesz pelna komende
+)
+
 # --- Nowoczesne zamienniki klasykow (wiekszosc w Rust) ----------------------
 BREW_MODERN=(
     eza                # ls
@@ -141,7 +151,7 @@ main() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
         # || — jeden zepsuty pakiet nie ubija calego skryptu; bledy widac wyzej
-        brew install "${BREW_CORE[@]}" "${BREW_MODERN[@]}" "${BREW_COLOR[@]}" \
+        brew install "${BREW_CORE[@]}" "${BREW_ZSH[@]}" "${BREW_MODERN[@]}" "${BREW_COLOR[@]}" \
                      "${BREW_DEV[@]}" "${BREW_MISC[@]}" "${BREW_CLOUD[@]}" \
                      "${BREW_LSP[@]}" || echo "!! brew: czesc pakietow sie nie zainstalowala"
         brew install --cask "${BREW_CASKS[@]}" || echo "!! brew cask: blad"
