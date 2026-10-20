@@ -8,6 +8,7 @@ BREW_CORE=(
     curl wget
     tree-sitter-cli
     dotter             # symlinki dotfiles (-y)
+    just               # justfile w repo: just deploy / setup / vscode
 )
 
 # --- Nowoczesne zamienniki klasykow (wiekszosc w Rust) ----------------------

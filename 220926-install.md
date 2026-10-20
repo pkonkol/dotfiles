@@ -15,11 +15,11 @@ exec fish
 ```
 
 **Pliki w `$HOME` to symlinki do repo** (Dotter, mapowanie w `.dotter/global.toml`).
-Edycja w `$HOME` i w repo to ta sama zmiana. `dotter deploy` tylko po dodaniu
-nowego pliku do mapowania:
+Edycja w `$HOME` i w repo to ta sama zmiana. Deploy tylko po dodaniu
+nowego pliku do mapowania (`just` bez argumentów wypisuje wszystkie recepty):
 
 ```bash
-cd ~/projects/dotfiles && dotter deploy && exec fish
+cd ~/projects/dotfiles && just deploy && just deploy --apply && exec fish
 ```
 
 Opcjonalnie, gdy chcesz najnowsze wersje budowane u siebie:
