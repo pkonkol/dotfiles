@@ -12,6 +12,12 @@
   "extensions.experimental.affinity": { "asvetliakov.vscode-neovim": 1 },
   // Przewijaniem rzadzi VS Code, nie nvim: to jest odpowiednik scrolloff=10 z init.lua
   "editor.cursorSurroundingLines": 10,
+  // Ctrl-klawisze, ktore w normal mode ida do nvima zamiast do VS Code.
+  // Domyslna lista z vscode-neovim 1.20.1 + n, p dla yanky (historia wklejania).
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "a", "b", "c", "d", "e", "f", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "t", "u", "v", "w", "x", "y", "z",
+    "/", "]", "right", "left", "up", "down", "backspace", "delete"
+  ],
 
   // Cala lista zastepuje domyslne menu VSpaceCode (styl Spacemacsa)
   "whichkey.bindings": [

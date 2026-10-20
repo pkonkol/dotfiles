@@ -355,20 +355,17 @@ vim.keymap.set("n", "<leader><leader>", fzf("global"), { desc = "szukaj wszystki
 --     af/if ac/ic aa/ia, ]f [f ]c [c, ; , — wspolne z init-vscode.lua
 require("pk.textobjects")
 
--- [6] flash — folke, 4.3k★ --------------------------------------- wylaczony
---     Skok w dowolne widoczne miejsce: s + 2 znaki + etykieta. Nastepca
---     easymotion/sneak (oba sa w VSCodeVim, domyslnie wylaczone).
---     Domyslnie ulepsza tez f/F/t/T — KOLIDUJE z repeatable_move z bloku [5].
---     Przy wlaczaniu dodaj do setup: modes = { char = { enabled = false } }
---     Nadpisuje wbudowane 's' (= 'cl').
---     KONFLIKT: README flash mapuje S takze w visual — tam S nalezy do
---     nvim-surround, wiec S tylko w n/o.
---     leap.nvim (5.0k★) to alternatywa z innymi klawiszami; flash = konwencja LazyVim.
--- vim.pack.add({ gh("folke/flash.nvim") })
--- require("flash").setup({})
--- vim.keymap.set({ "n", "x", "o" }, "s", function() require("flash").jump() end,       { desc = "flash" })
--- vim.keymap.set({ "n", "o" },      "S", function() require("flash").treesitter() end, { desc = "flash: wezel treesittera" })
--- vim.keymap.set("o",               "r", function() require("flash").remote() end,     { desc = "flash: remote" })
+-- [6] flash — folke, 4.3k★ ----------------------------------------- AKTYWNY
+--     s skok, S wezel treesittera, r remote (w operatorze) — wspolne z init-vscode.lua
+require("pk.flash")
+
+-- [Y] yanky — gbprod, 1.3k★ ------------------------------------------ AKTYWNY
+--     p, potem <C-p>/<C-n> = starszy/nowszy wpis historii — wspolne z init-vscode.lua
+require("pk.yanky")
+
+-- [D] dial — monaqa, 1.1k★ ------------------------------------------- AKTYWNY
+--     <C-a>/<C-x> tez na datach, true/false, [ ]/[x] — wspolne z init-vscode.lua
+require("pk.dial")
 
 -- [7] oil — stevearc, 6.9k★ -------------------------------------- wylaczony
 --     Katalog jako zwykly bufor: zmieniasz nazwy edytujac tekst, kasujesz dd,

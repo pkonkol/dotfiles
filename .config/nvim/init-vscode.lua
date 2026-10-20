@@ -38,6 +38,9 @@ vim.pack.add({
 })
 require("hardtime").setup({ disable_mouse = false })
 require("pk.textobjects")
+require("pk.flash")
+require("pk.yanky")
+require("pk.dial")
 
 -- ===========================================================================
 --  UI — klawisze z init.lua, akcja z VS Code
