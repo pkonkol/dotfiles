@@ -124,6 +124,20 @@ install_mise_tools() {
     mise use -g node@lts
 }
 
+# Skille Claude Code: plugin "pk" -> /pk:<skill>. Zrodlo w dotfiles/pk-skills (.gitignore),
+# ~/.claude/skills/pk to symlink; Claude Code laduje go jako pk@skills-dir.
+# Prywatne repo: git zapyta o login i token (credential.helper=store).
+install_pk_skills() {
+    local dir="$PWD/pk-skills" link="$HOME/.claude/skills/pk"
+    [[ -d "$dir" ]] || git clone https://github.com/pkonkol/pk-skills.git "$dir"
+    if [[ -e "$link" && ! -L "$link" ]]; then
+        echo "!! $link to zwykly katalog, nie symlink: przenies zmiany do $dir i usun go"; return 1
+    fi
+    mkdir -p "$(dirname "$link")"
+    ln -sfn "$dir" "$link"
+    /usr/bin/python3 "$dir/scripts/deploy.py" --apply   # reguly pk -> symlinki w ~/.claude/rules
+}
+
 main() {
     parse "$@"
 
@@ -148,6 +162,7 @@ main() {
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 	# TODO lepsze miejsce, najlepiej w brew ale to ma dependencje na ten step totaj. Nie zapomne, moze tak wisiec na razie.
         cargo install rgrc
+        install_pk_skills || echo "!! pk-skills: nie wgrane"
     fi
 
     if [[ ${PREPARE_FISH:-0} -eq 1 ]]; then
@@ -187,10 +202,10 @@ main() {
 
 usage() {
     cat <<USAGE
-Usage: $0 [-a] [-b] [-d] [-f] [-c] [-u] [-y]
+Usage: $0 [-a] [-b] [-d] [-f] [-m] [-c] [-y]
   -a    Wszystko
   -b    Pakiety Homebrew (to jest jedyne co realnie potrzebne na macOS)
-  -d    Pobierane rzeczy (tpm, rustup)
+  -d    Pobierane rzeczy (font, tpm, rustup, skille Claude /pk:)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
   -m    Zainstaluj przez mise to, co wymaga pinowania wersji (node; terraform opcjonalnie)
   -c    OPCJA DODATKOWA: zbuduj podstawowe narzedzia z cargo
@@ -201,7 +216,7 @@ USAGE
 
 parse() {
     [[ $# -eq 0 ]] && usage
-    while getopts "abdfmcuy" opt; do
+    while getopts "abdfmcy" opt; do
         case ${opt} in
             a ) INSTALL_BREW=1; INSTALL_DOWNLOADABLE=1; PREPARE_FISH=1; MISE_TOOLS=1; DEPLOY_DOTFILES=1 ;;
             b ) INSTALL_BREW=1 ;;

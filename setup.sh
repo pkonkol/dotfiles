@@ -25,15 +25,17 @@ main() {
 
     if [[ ${INSTALL_DOWNLOADABLE:-0} -eq 1 ]]; then
         # Nerd Font — na serwerze bez GUI zwykle zbedny, ale tmux/eza z ikonkami tak
-        wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/NerdFontsSymbolsOnly.zip"
+        wget -q -P /tmp "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/NerdFontsSymbolsOnly.zip"
         mkdir -p ~/.local/share/fonts
-        unzip -o -d ~/.local/share/fonts NerdFontsSymbolsOnly.zip
+        unzip -o -d ~/.local/share/fonts /tmp/NerdFontsSymbolsOnly.zip
         fc-cache -fv
         [[ -d ~/.tmux/plugins/tpm ]] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
         command -v rustup >/dev/null 2>&1 || \
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         # mise — wersje runtimeow (w apt go nie ma)
         curl https://mise.run | sh
+        # uv — potrzebny do ./deploy.py (w apt go nie ma)
+        curl -LsSf https://astral.sh/uv/install.sh | sh
     fi
 
     if [[ ${PREPARE_FISH:-0} -eq 1 ]]; then
@@ -44,6 +46,9 @@ main() {
         tldr --update || true
         mkdir -p ~/.config/fish/completions
         command -v kubectl >/dev/null && kubectl completion fish > ~/.config/fish/completions/kubectl.fish
+        command -v helm    >/dev/null && helm    completion fish > ~/.config/fish/completions/helm.fish
+        command -v gh      >/dev/null && gh      completion -s fish > ~/.config/fish/completions/gh.fish
+        command -v mise    >/dev/null && mise    completion fish > ~/.config/fish/completions/mise.fish
     fi
 
     # --- cargo: na Linuksie czesto NIE opcja, tylko koniecznosc (stare apt) ---
@@ -57,7 +62,8 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        ./deploy.py
+        export PATH="$HOME/.local/bin:$PATH"   # tu laduja uv i mise z -d
+        ./deploy.py --homelab
     fi
 
     if [[ ${SETUP_UFW:-0} -eq 1 ]]; then
@@ -76,7 +82,7 @@ usage() {
 Usage: $0 [-a] [-i] [-d] [-f] [-c] [-u] [-w] [-y]
   -a    Wszystko
   -i    Pakiety apt
-  -d    Pobierane rzeczy (fonty, tpm, rustup, mise)
+  -d    Pobierane rzeczy (fonty, tpm, rustup, mise, uv)
   -f    Przygotuj fisha (chsh, fisher, bass, cache completions)
   -c    Zbuduj podstawowe narzedzia z cargo (zalecane: apt ma stare wersje)
   -u    Zbuduj dodatkowe narzedzia z cargo
