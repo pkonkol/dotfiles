@@ -1,6 +1,6 @@
 -- yanky — gbprod, 1.3k★
 --     Historia kopiowania (yank ring). Wspolny dla init.lua i init-vscode.lua;
---     Obsidian dostaje to samo z vim_motions.lua (te same klawisze).
+--     Obsidian: wbudowany yank-ring Vim Motions (te same klawisze).
 --     p / P wklejaja jak zwykle; zaraz po wklejeniu <C-p> / <C-n> podmienia
 --     wklejony tekst na starszy / nowszy wpis z historii.
 local function gh(repo) return "https://github.com/" .. repo end

@@ -4,7 +4,7 @@
 --     Ruchy:   ]f/[f funkcja, ]c/[c klasa (konwencja LazyVim; w trybie diff
 --              ]c/[c zostaja natywne).
 --     NIE ustawiamy vim.g.no_plugin_maps — zabiloby ]] / [[ w markdownie.
---     Parsery instaluje nvim-treesitter w init.lua; VS Code korzysta z tych samych.
+--     Parsery instaluje pk/treesitter.lua (init.lua); VS Code korzysta z tych samych.
 local function gh(repo) return "https://github.com/" .. repo end
 
 vim.pack.add({

@@ -12,7 +12,7 @@
 -- configure one of them yourself, delete that block or place your
 -- own setup after the require.
 
-vim.g.mapleader = '\\'
+vim.g.mapleader = ' '
 vim.opt.textwidth = 100
 
 -- Surround

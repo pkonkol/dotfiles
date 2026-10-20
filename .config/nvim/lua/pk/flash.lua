@@ -1,6 +1,6 @@
 -- [6] flash — folke, 4.3k★
 --     Wspolny dla init.lua (terminal) i init-vscode.lua (VS Code rysuje etykiety
---     jako dekoracje). Obsidian dostaje flash z generowanego vim_motions.lua.
+--     jako dekoracje). Obsidian: wbudowany flash wtyczki Vim Motions.
 --     Skok w dowolne widoczne miejsce: s + znaki + etykieta. Nastepca
 --     easymotion/sneak; leap.nvim (5.0k★) to alternatywa, flash = konwencja LazyVim.
 --     f/F/t/T: etykiety na celach + powtarzanie tym samym klawiszem (f x, potem

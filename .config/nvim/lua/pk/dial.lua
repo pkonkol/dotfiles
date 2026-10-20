@@ -1,7 +1,7 @@
 -- dial — monaqa, 1.1k★
 --     Rozszerza <C-a> / <C-x> (+1 / -1 pod kursorem albo dalej w linii).
---     Wspolny dla init.lua i init-vscode.lua. Lista obiektow jak w bloku, ktory
---     generuje Vim Motions do vim_motions.lua — w Obsidianie dziala tak samo.
+--     Wspolny dla init.lua i init-vscode.lua. Lista obiektow jak w bloku dial,
+--     ktory generuje Vim Motions; w Obsidianie dziala jego wbudowany odpowiednik.
 --     Obiekty: liczby, hex, daty 2026-10-20 i 2026/10/20, true/false,
 --     kolory #a1b2c3, checkbox [ ] <-> [x].
 local function gh(repo) return "https://github.com/" .. repo end

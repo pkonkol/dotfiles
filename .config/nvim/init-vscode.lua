@@ -31,12 +31,14 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- ===========================================================================
 --  EDYCJA — to samo co w terminalu
 -- ===========================================================================
+-- Spec taki jak w init.lua — inny 'version' przepisuje wspolny nvim-pack-lock.json.
 vim.pack.add({
   gh("MunifTanjim/nui.nvim"),
   gh("m4xshen/hardtime.nvim"),
   { src = gh("kylechui/nvim-surround"), version = vim.version.range("4.x") },
 })
 require("hardtime").setup({ disable_mouse = false })
+-- Moduly same instaluja swoje pluginy
 require("pk.textobjects")
 require("pk.flash")
 require("pk.yanky")
