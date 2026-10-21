@@ -82,7 +82,7 @@ BREW_LSP=(
     taplo                         # taplo
     dockerfile-language-server    # dockerls        (npm)
     typescript-language-server    # ts_ls           (npm, + typescript)
-    terraform-ls                  # terraformls
+    #terraform-ls                  # terraformls
 )
 
 # --- Dev / wersje runtimeow --------------------------------------------------

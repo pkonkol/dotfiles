@@ -1,10 +1,13 @@
 # Dotfiles. `just` bez argumentów wypisuje recepty.
 
+dotter_package := if os() == "macos" { "mac" } else if os() == "linux" { "linux" } else { error("nieobslugiwany system: " + os()) }
+
 default:
     @just --list
 
 # symlinki z .dotter/global.toml do $HOME (dry-run; `just deploy --apply` wykonuje)
 deploy apply="":
+    @test -f .dotter/local.toml || echo 'packages = ["{{ dotter_package }}"]' > .dotter/local.toml
     dotter deploy -v {{ if apply == "--apply" { "" } else { "--dry-run" } }}
 
 # instalacja maszyny, flagi jak w setup-mac.sh (np. just setup -b)
