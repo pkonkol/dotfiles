@@ -87,6 +87,9 @@ zstyle ':completion:*' use-cache on   # wolne completion (brew, pip) z cache w ~
 # ============================================================================
 # laptop, nie serwer: bez tego p10k sprawdza SSH przez `who am i` (fork, ~11 ms)
 [[ -z $SSH_CONNECTION ]] && typeset -gx P9K_SSH=0 _P9K_SSH_TTY=$TTY
+# Termux: gotowe gitstatusd sa statyczne (nie-PIE) i Android ich nie odpala.
+# Bez gitstatus p10k liczy stan repo przez vcs_info: wolniej, na telefonie bez znaczenia.
+[[ $OSTYPE == *android* ]] && typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
 source $ZP_P10K/powerlevel10k.zsh-theme
 source ~/.p10k.zsh
 
@@ -97,6 +100,9 @@ autoload -Uz add-zsh-hook
 # ============================================================================
 ZVM_LINE_INIT_MODE=i          # kazda nowa linia w insert, jak w fishu
 ZVM_VI_SURROUND_BINDKEY=classic   # ys / cs / ds
+# Termux: regex '\e\]...\a' w zvm_cursor_style wywraca regcomp z Bioniki
+# ("trailing backslash"). Bez zmiany kursora tryb i tak widac po znaku zachety p10k.
+[[ $OSTYPE == *android* ]] && ZVM_CURSOR_STYLE_ENABLED=false
 _pk_newline() { LBUFFER+=$'\n' }   # Shift+Enter: nowa linia, bez uruchamiania
 zle -N _pk_newline
 
