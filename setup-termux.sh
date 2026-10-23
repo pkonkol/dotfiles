@@ -2,8 +2,8 @@
 # ============================================================================
 #  setup-termux.sh — bootstrap Termuksa (Android, bez roota)
 #  Pierwszy raz:
-#    pkg install -y git && git clone https://github.com/pkonkol/dotfiles ~/dotfiles
-#    cd ~/dotfiles && bash setup-termux.sh        # bez flag = wszystko poza -t
+#    pkg install -y git just && git clone https://github.com/pkonkol/dotfiles ~/dotfiles
+#    cd ~/dotfiles && just setup                  # bez flag = wszystko poza -t
 #  Potem jak wszedzie: git pull && just deploy --apply
 #
 #  Termux z Google Play i z F-Droid: oba dzialaja, roznica tylko w termux-api (nizej).

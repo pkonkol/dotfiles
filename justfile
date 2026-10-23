@@ -16,15 +16,12 @@ deploy apply="":
 setup *flags:
     bash setup-mac.sh {{ flags }}
 
-# instalacja maszyny, flagi jak w setup.sh (np. just setup -i)
+# instalacja maszyny, flagi jak w setup.sh / setup-termux.sh (np. just setup -i)
+# Termux to dla justa tez "linux", wiec rozroznia go TERMUX_VERSION
 [linux]
 setup *flags:
-    bash setup.sh {{ flags }}
+    bash {{ if env("TERMUX_VERSION", "") != "" { "setup-termux.sh" } else { "setup.sh" } }} {{ flags }}
 
 # scal .config/vscode/settings/*.jsonc do profili VS Code (z backupem), np. just vscode dotfiles aiboostr
 vscode +profiles:
     .config/vscode/merge-settings.py {{ profiles }}
-
-# Termux (Android): flagi jak w setup-termux.sh (np. just termux -p)
-termux *flags:
-    bash setup-termux.sh {{ flags }}
