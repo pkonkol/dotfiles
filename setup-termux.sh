@@ -4,7 +4,8 @@
 #  Pierwszy raz:
 #    pkg install -y git just && git clone https://github.com/pkonkol/dotfiles ~/dotfiles
 #    cd ~/dotfiles && just setup                  # bez flag = wszystko poza -t
-#  Potem jak wszedzie: git pull && just deploy --apply
+#  Potem: just deploy --apply  (symlinki robi tylko just, ten skrypt instaluje)
+#  i dalej jak wszedzie: git pull && just deploy --apply
 #
 #  Termux z Google Play i z F-Droid: oba dzialaja, roznica tylko w termux-api (nizej).
 #  Termux to nie Debian: libc to Bionic (nie glibc), nie ma sudo ani /usr,
@@ -14,7 +15,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-PKG_CORE=(zsh git tmux neovim just curl openssh)
+PKG_CORE=(zsh git tmux neovim just curl openssh xz-utils)   # xz: font .tar.xz
 PKG_MODERN=(eza bat fd ripgrep fzf zoxide git-delta lazygit)
 PKG_MEDIA=(ffmpeg)
 # schowek dla nvim + termux-share. Termux z Google Play ma je wbudowane (od 2024.07),
@@ -33,7 +34,6 @@ ZSH_PLUGINS=(
     MichaelAquilina/zsh-you-should-use
 )
 
-DOTTER_VERSION=v0.13.5
 FONT_URL=https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz
 FONT_FILE=JetBrainsMonoNerdFontMono-Regular.ttf
 
@@ -44,7 +44,7 @@ main() {
     [[ ${DO_STORAGE:-0} -eq 1 ]] && storage
     [[ ${DO_PKG:-0}     -eq 1 ]] && packages
     [[ ${DO_ZSH:-0}     -eq 1 ]] && zsh_setup
-    [[ ${DO_DEPLOY:-0}  -eq 1 ]] && deploy
+    [[ ${DO_DOTTER:-0}  -eq 1 ]] && dotter_install
     [[ ${DO_FONT:-0}    -eq 1 ]] && font
     [[ ${DO_TS:-0}      -eq 1 ]] && treesitter_cli
     command -v termux-reload-settings >/dev/null && termux-reload-settings || true
@@ -52,7 +52,7 @@ main() {
     if (( ${#failed[@]} )); then
         echo "!! nie udalo sie: ${failed[*]}"
     fi
-    echo "== gotowe. Nowa sesja Termuksa (albo: exec zsh). Pierwszy nvim pobierze pluginy."
+    echo "== dalej: just deploy --apply, potem nowa sesja Termuksa. Pierwszy nvim pobierze pluginy."
 }
 
 storage() {
@@ -83,19 +83,20 @@ zsh_setup() {
     [[ $(basename "${SHELL:-}") == zsh ]] || chsh -s zsh
 }
 
-deploy() {
-    if ! command -v dotter >/dev/null; then
-        # w repo Termuksa dottera raczej nie ma; statyczna binarka musl dziala bez glibc
-        mkdir -p ~/.local/bin
-        curl -fsSL -o ~/.local/bin/dotter \
-            "https://github.com/SuperCuber/dotter/releases/download/$DOTTER_VERSION/dotter-linux-arm64-musl" \
-            && chmod +x ~/.local/bin/dotter || { failed+=(dotter); return; }
-        export PATH=~/.local/bin:$PATH
-    fi
-    [[ -f .dotter/local.toml ]] || echo 'packages = ["termux"]' > .dotter/local.toml
-    mkdir -p ~/bin ~/.termux
-    # --force: swiezy Termux ma juz wlasne ~/.termux/termux.properties
-    dotter deploy -v --force || failed+=(dotter-deploy)
+dotter_install() {
+    # Gotowa binarka z GitHuba (musl, statyczna) NIE dziala: Android uruchamia tylko
+    # PIE ("unexpected e_type: 2"). Zostaje pkg, a jak nie ma, cargo (~5 min).
+    dotter --version >/dev/null 2>&1 && return
+    rm -f ~/.local/bin/dotter   # zepsuta binarka z poprzedniej wersji tego skryptu
+    # link do $PREFIX/bin: just deploy dziala od razu, zanim .zshrc doda ~/.cargo/bin
+    pkg install -y dotter >/dev/null 2>&1 \
+        || { pkg install -y rust && cargo install --locked dotter \
+             && ln -sf ~/.cargo/bin/dotter "$PREFIX/bin/dotter"; } \
+        || failed+=(dotter)
+    # swiezy Termux ma wlasny termux.properties; dotter bez --force by go pominal
+    local f=~/.termux/termux.properties
+    [[ -f $f && ! -L $f ]] && mv "$f" "$f.bak"
+    return 0
 }
 
 font() {
@@ -117,7 +118,7 @@ treesitter_cli() {
 
 parse() {
     if [[ $# -eq 0 ]]; then
-        DO_STORAGE=1 DO_PKG=1 DO_ZSH=1 DO_DEPLOY=1 DO_FONT=1
+        DO_STORAGE=1 DO_PKG=1 DO_ZSH=1 DO_DOTTER=1 DO_FONT=1
         return
     fi
     while getopts "spzdfth" opt; do
@@ -125,7 +126,7 @@ parse() {
             s) DO_STORAGE=1 ;;
             p) DO_PKG=1 ;;
             z) DO_ZSH=1 ;;
-            d) DO_DEPLOY=1 ;;
+            d) DO_DOTTER=1 ;;
             f) DO_FONT=1 ;;
             t) DO_TS=1 ;;
             *) usage; exit 0 ;;
@@ -139,7 +140,7 @@ Uzycie: bash setup-termux.sh [flagi]     (bez flag = -s -p -z -d -f)
   -s    termux-setup-storage (~/storage -> pamiec telefonu)
   -p    pakiety z pkg
   -z    pluginy zsh (git clone do $ZP), tpm, chsh -s zsh
-  -d    dotter (binarka musl, jesli brak) + deploy z packages = ["termux"]
+  -d    dotter (pkg albo cargo); symlinki potem: just deploy --apply
   -f    JetBrainsMono Nerd Font Mono -> ~/.termux/font.ttf
   -t    tree-sitter CLI z cargo (wolne; bez tego nvim ma tylko wbudowane parsery)
 USAGE
