@@ -22,6 +22,11 @@ source ${ZP_P10K:-/opt/homebrew/share/powerlevel10k}/config/p10k-lean.zsh
   )
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 
+  # --- Termux: gotowe gitstatusd sa statyczne (nie-PIE), Android ich nie odpala ---
+  # Musi byc TUTAJ, nie w .zshrc: p10k-lean.zsh na starcie robi unset wszystkich POWERLEVEL9K_*.
+  # Bez gitstatus p10k liczy stan repo przez vcs_info (wolniej, na telefonie bez znaczenia).
+  [[ $OSTYPE == *android* ]] && typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
+
   # --- po Enter caly prompt zostaje (katalog widac w historii ekranu) ---
   # inne wartosci: always = zostaje sam znak zachety, same-dir = skraca tylko w tym samym katalogu
   typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off
