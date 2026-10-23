@@ -1,0 +1,26 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# ============================================================================
+#  "Udostepnij -> Termux" na pliku: Termux kopiuje go do ~/downloads
+#  i odpala ~/bin/termux-file-editor <sciezka>.  (dotter: [termux] w global.toml)
+#  Film -> menu presetow compressor -> wynik od razu w "Udostepnij" (Discord).
+#  Inne pliki -> nvim.
+# ============================================================================
+f="$1"
+case "$(printf %s "$f" | tr 'A-Z' 'a-z')" in
+  *.mp4|*.mov|*.mkv|*.webm|*.3gp|*.avi) ;;
+  *) exec nvim "$f" ;;
+esac
+
+echo "$f"
+echo "  1) 10 MB (Discord)   2) 25 MB   3) small   4) hq   albo wpisz MB"
+printf "preset [1]: "; read -r c
+case "${c:-1}" in
+  1) p=10 ;; 2) p=25 ;; 3) p=small ;; 4) p=hq ;; *) p=$c ;;
+esac
+
+if out=$("$HOME/.local/bin/compressor" "$f" "$p"); then
+  # termux-share: wbudowane w Termux z Google Play; z F-Droid = pakiet termux-api + apka Termux:API
+  command -v termux-share >/dev/null && termux-share -a send "$out"
+  echo "gotowe: $out"
+fi
+printf "Enter zamyka"; read -r _

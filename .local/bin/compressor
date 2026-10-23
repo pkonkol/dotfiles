@@ -1,0 +1,59 @@
+#!/usr/bin/env sh
+# ============================================================================
+#  compressor — ffmpeg z presetami, zebym nie pamietal flag.
+#    compressor film.mp4            -> film.10mb.mp4   (limit Discorda bez Nitro)
+#    compressor film.mp4 25         -> film.25mb.mp4   (liczba = docelowe MB, 2 przebiegi)
+#    compressor film.mp4 small      -> crf 30, max 720p  (rozmiar "jaki wyjdzie")
+#    compressor film.mp4 hq         -> crf 23, max 1080p
+#  stdout: TYLKO sciezka wyniku (termux-file-editor ja przekazuje do share),
+#  postep ffmpeg idzie na stderr.
+#  Bez awk/bc: w swiezym Termuksie ich nie ma, liczymy na intach w sh.
+# ============================================================================
+set -eu
+
+in="${1:?uzycie: compressor <plik> [MB|small|hq]}"
+preset="${2:-10}"
+[ -f "$in" ] || { echo "brak pliku: $in" >&2; exit 1; }
+
+ff="ffmpeg -hide_banner -loglevel warning -stats -y"
+# -pix_fmt yuv420p: Pixel nagrywa HDR 10-bit, a 8-bit H.264 odtworzy kazdy klient
+venc="-c:v libx264 -preset medium -pix_fmt yuv420p"
+mux="-movflags +faststart"
+
+case "$preset" in
+  small|hq)
+    if [ "$preset" = small ]; then crf=30 h=720; else crf=23 h=1080; fi
+    out="${in%.*}.$preset.mp4"
+    $ff -i "$in" -vf "scale=-2:'min($h,ih)'" $venc -crf $crf \
+        -c:a aac -b:a 128k $mux "$out" >&2
+    ;;
+  *[!0-9]*|'')
+    echo "nieznany preset: $preset (liczba MB, small, hq)" >&2; exit 1 ;;
+  *)
+    mb=$preset
+    out="${in%.*}.${mb}mb.mp4"
+    dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$in")
+    case "$dur" in   # zaokraglone w gore: krotszy czas = za duzy plik
+      [0-9]*) dur=$(( ${dur%.*} + 1 )) ;;
+      *) echo "ffprobe nie zna dlugosci: $in" >&2; exit 1 ;;
+    esac
+    # MiB -> kbit, 5% zapasu na kontener; potem minus audio
+    total=$(( mb * 1024 * 8 * 95 / 100 / dur ))
+    abr=96;  [ $total -lt 600 ] && abr=64
+    vbr=$(( total - abr ))
+    [ $vbr -lt 100 ] && { echo "za dlugi film na ${mb} MB (${vbr} kbit/s obrazu)" >&2; exit 1; }
+    # nizszy bitrate = mniejsza rozdzielczosc, inaczej wychodzi kasza
+    if   [ $vbr -lt 1000 ]; then h=480
+    elif [ $vbr -lt 2500 ]; then h=720
+    else h=1080; fi
+    tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+    echo "${dur}s -> ${vbr}k obraz + ${abr}k dzwiek, max ${h}p" >&2
+    $ff -i "$in" -vf "scale=-2:'min($h,ih)'" $venc -b:v ${vbr}k \
+        -pass 1 -passlogfile "$tmp/pass" -an -f null /dev/null >&2
+    $ff -i "$in" -vf "scale=-2:'min($h,ih)'" $venc -b:v ${vbr}k \
+        -pass 2 -passlogfile "$tmp/pass" -c:a aac -b:a ${abr}k $mux "$out" >&2
+    ;;
+esac
+
+du -h "$out" >&2
+echo "$out"
