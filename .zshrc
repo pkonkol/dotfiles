@@ -1,5 +1,6 @@
 # ============================================================================
-#  .zshrc — czysty zsh bez frameworka. Pluginy z brew, `source` z /opt/homebrew.
+#  .zshrc — czysty zsh bez frameworka. Pluginy z brew (mac) albo z
+#  ~/.local/share/zsh-plugins (Termux, klonuje je setup-termux.sh -z).
 #  Zasada jak w config.fish: zero forkow przy starcie i w promptcie.
 #  Pomiar:  hyperfine -N -w 3 'zsh -i -c exit'
 # ============================================================================
@@ -9,7 +10,28 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-BREW=/opt/homebrew
+# Skad pluginy: brew na macu, w Termuksie git clone z setup-termux.sh -z
+if [[ -d /opt/homebrew ]]; then
+  BREW=/opt/homebrew
+  ZP_P10K=$BREW/share/powerlevel10k   # tez dla .p10k.zsh (p10k-lean.zsh)
+  ZP_ZVM=$BREW/opt/zsh-vi-mode/share/zsh-vi-mode
+  ZP_YSU=$BREW/share/zsh-you-should-use
+  ZP_AS=$BREW/share/zsh-autosuggestions
+  ZP_SH=$BREW/share/zsh-syntax-highlighting
+  ZP_HSS=$BREW/share/zsh-history-substring-search
+  ZP_FZF_KEYS=$BREW/opt/fzf/shell/key-bindings.zsh
+  ZP_FZF_COMP=$BREW/opt/fzf/shell/completion.zsh
+else
+  ZP=~/.local/share/zsh-plugins
+  ZP_P10K=$ZP/powerlevel10k
+  ZP_ZVM=$ZP/zsh-vi-mode
+  ZP_YSU=$ZP/zsh-you-should-use
+  ZP_AS=$ZP/zsh-autosuggestions
+  ZP_SH=$ZP/zsh-syntax-highlighting
+  ZP_HSS=$ZP/zsh-history-substring-search
+  ZP_FZF_KEYS=$ZP/fzf.zsh   # `fzf --zsh` zapisane przy setupie: bindy + completion w jednym
+  ZP_FZF_COMP=
+fi
 
 # ============================================================================
 #  PATH  (typeset -U = bez duplikatow; (N/) = tylko istniejace katalogi)
@@ -21,12 +43,12 @@ path=(
   # Przed brew, bo brew tez ma node/terraform/kubectl/just.
   ~/.local/share/mise/installs/*/global/bin(N-/)
   ~/.local/share/mise/installs/*/global(N-/)    # `-` = podazaj za symlinkiem
-  $BREW/bin $BREW/sbin
+  ${BREW:+$BREW/bin} ${BREW:+$BREW/sbin}   # puste bez brew znikaja z tablicy
   ~/.local/bin ~/.cargo/bin ~/.docker/bin
   /Applications/WezTerm.app/Contents/MacOS(N/)
   $path
 )
-fpath=($BREW/share/zsh/site-functions $fpath)
+fpath=(${BREW:+$BREW/share/zsh/site-functions} $fpath)
 
 # ============================================================================
 #  ZACHOWANIE POWLOKI
@@ -65,40 +87,23 @@ zstyle ':completion:*' use-cache on   # wolne completion (brew, pip) z cache w ~
 # ============================================================================
 # laptop, nie serwer: bez tego p10k sprawdza SSH przez `who am i` (fork, ~11 ms)
 [[ -z $SSH_CONNECTION ]] && typeset -gx P9K_SSH=0 _P9K_SSH_TTY=$TTY
-source $BREW/share/powerlevel10k/powerlevel10k.zsh-theme
+source $ZP_P10K/powerlevel10k.zsh-theme
 source ~/.p10k.zsh
 
-# Tlo transient promptu jak w config.fish: wykonana komenda dostaje niebieskie
-# tlo na cala szerokosc = wyrazny separator w scrollbacku. p10k zostawia juz
-# '❯ komenda'; preexec wraca kursorem na te linie i rysuje je ponownie z tlem.
-# Ponownie rysowana komenda traci kolory skladni.
-PK_TRANSIENT_BG='#1A4873'   # przygaszony srcery blue
-_pk_transient_bg() {
-  local -i last_status=$? rows=0 width
-  local line
-  for line in "${(@f)1}"; do
-    width=${(m)#line}
-    (( rows )) || width+=2               # '❯ ' tylko w pierwszej linii
-    rows+=$(( width / COLUMNS + 1 ))
-  done
-  local char_color=10
-  (( last_status )) && char_color=9
-  print -Pn "%{\e[${rows}A\r%}%K{$PK_TRANSIENT_BG}%B%F{$char_color}❯%f%b "
-  print -rn -- "${1//$'\n'/$'\e[K\n'}"
-  print -Pn '\e[K%k\n'
-}
 autoload -Uz add-zsh-hook
-add-zsh-hook preexec _pk_transient_bg
 
 # ============================================================================
 #  VI MODE  (zsh-vi-mode: text objects, surround, `.`, liczniki, vv -> nvim)
 # ============================================================================
 ZVM_LINE_INIT_MODE=i          # kazda nowa linia w insert, jak w fishu
 ZVM_VI_SURROUND_BINDKEY=classic   # ys / cs / ds
+_pk_newline() { LBUFFER+=$'\n' }   # Shift+Enter: nowa linia, bez uruchamiania
+zle -N _pk_newline
+
 
 # zsh-vi-mode nadpisuje bindy przy inicjalizacji, wiec cudze bindy dopiero tu
 zvm_after_init() {
-  source $BREW/opt/fzf/shell/key-bindings.zsh   # Ctrl-R, Ctrl-T, Alt-C
+  source $ZP_FZF_KEYS   # Ctrl-R, Ctrl-T, Alt-C
   bindkey -M viins '^F' autosuggest-accept      # jak ctrl-f w config.fish
   bindkey -M viins '^[e' zvm_vi_edit_command_line   # Alt-e jak w fishu
   bindkey -M vicmd '^[e' zvm_vi_edit_command_line
@@ -107,9 +112,11 @@ zvm_after_init() {
   bindkey -M viins '^[[B' history-substring-search-down
   bindkey -M vicmd 'k' history-substring-search-up
   bindkey -M vicmd 'j' history-substring-search-down
+  bindkey -M viins '^[[13;2u' _pk_newline
+  bindkey -M vicmd '^[[13;2u' _pk_newline
 }
-source $BREW/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-source $BREW/opt/fzf/shell/completion.zsh   # ** + Tab
+source $ZP_ZVM/zsh-vi-mode.plugin.zsh
+[[ -n $ZP_FZF_COMP ]] && source $ZP_FZF_COMP   # ** + Tab
 
 # ============================================================================
 #  INTEGRACJE  (kazda to JEDEN fork przy starcie)
@@ -162,7 +169,7 @@ alias tsl='just state-local' tsr='just state-remote'
 # ============================================================================
 # plugin bierze kolory z 5x $(tput ...) = 5 forkow (~40 ms); echoti to to samo wbudowane w zsh
 tput() { echoti "$@" }
-source $BREW/share/zsh-you-should-use/you-should-use.plugin.zsh   # "masz alias gs"
+source $ZP_YSU/you-should-use.plugin.zsh   # "masz alias gs"
 unfunction tput
 add-zsh-hook -d preexec _check_git_aliases   # bez aliasow z .gitconfig: forkuje git+sort (~20 ms) przed kazdym `git ...`
 
@@ -170,6 +177,6 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'   # brblack, jak fish_color_autosuggestio
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1          # bez przepinania widgetow przy kazdym prompcie
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)   # gdy historia nic nie ma, podpowiedz z completion (jak fish)
 ZSH_AUTOSUGGEST_USE_ASYNC=1              # completion liczone w tle, pisanie nie czeka
-source $BREW/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $BREW/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $BREW/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+source $ZP_AS/zsh-autosuggestions.zsh
+source $ZP_SH/zsh-syntax-highlighting.zsh
+source $ZP_HSS/zsh-history-substring-search.zsh

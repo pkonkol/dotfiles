@@ -6,7 +6,8 @@
 #  przechodzi sam: 8 brblack, 9 brred, 10 brgreen, 11 bryellow, 13 brmagenta, 15 brwhite.
 # ============================================================================
 
-source /opt/homebrew/share/powerlevel10k/config/p10k-lean.zsh
+# ZP_P10K ustawia .zshrc (brew na macu, ~/.local/share/zsh-plugins w Termuksie)
+source ${ZP_P10K:-/opt/homebrew/share/powerlevel10k}/config/p10k-lean.zsh
 
 () {
   emulate -L zsh
@@ -21,8 +22,9 @@ source /opt/homebrew/share/powerlevel10k/config/p10k-lean.zsh
   )
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 
-  # --- po Enter zostaje sam znak zachety; tlo dorysowuje _pk_transient_bg w .zshrc ---
-  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
+  # --- po Enter caly prompt zostaje (katalog widac w historii ekranu) ---
+  # inne wartosci: always = zostaje sam znak zachety, same-dir = skraca tylko w tym samym katalogu
+  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off
   typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
   # --- host zawsze (domyslnie p10k pokazuje go tylko po ssh / jako root) ---

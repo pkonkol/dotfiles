@@ -50,4 +50,14 @@ config.use_fancy_tab_bar = false
 config.send_composed_key_when_left_alt_is_pressed = false
 config.send_composed_key_when_right_alt_is_pressed = true
 
+-- ============================================================================
+--  SHIFT+ENTER = nowa linia w tej samej komendzie (Enter dalej uruchamia)
+--  Domyslnie terminal wysyla na Shift+Enter to samo co na Enter (\r), wiec
+--  shell nie ma jak ich odroznic. Wysylamy standardowe kodowanie CSI-u
+--  Shift+Enter; zsh ma na nie widget _pk_newline (.zshrc), nvim widzi <S-CR>.
+-- ============================================================================
+config.keys = {
+  { key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendString '\x1b[13;2u' },
+}
+
 return config

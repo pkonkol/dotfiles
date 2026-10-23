@@ -11,14 +11,18 @@ default_target_type = "symbolic"   # init.lua contains `{{`; automatic mode woul
 # one link for the whole dir so files nvim writes (nvim-pack-lock.json) land in the repo;
 # never add entries for paths inside .config/nvim: with --force dotter deletes them from the repo (dotter#218)
 ".config/nvim" = { target = "~/.config/nvim", type = "symbolic", recurse = false }
+".local/bin/compressor" = "~/.local/bin/compressor"   # ffmpeg z presetami (mac: brew ffmpeg, Termux: pkg)
+
+# zsh wspolny dla maca i Termuksa; .zshrc sam wybiera, skad brac pluginy
+[zsh.files]
+".zshrc" = "~/.zshrc"
+".p10k.zsh" = "~/.p10k.zsh"
 
 [mac]
-depends = ["common"]
+depends = ["common", "zsh"]
 
 [mac.files]
 ".tmux.conf" = "~/.tmux.conf"
-".zshrc" = "~/.zshrc"       # sciezki do pluginow z /opt/homebrew, wiec tylko mac
-".p10k.zsh" = "~/.p10k.zsh"
 # pk-skills is a separate repo cloned here by setup-mac.sh -d (gitignored); Claude Code loads it as plugin pk@skills-dir
 "pk-skills" = { target = "~/.claude/skills/pk", type = "symbolic", recurse = false }
 "pk-skills/rules" = "~/.claude/rules"   # per-file links, other files in ~/.claude/rules stay untouched
@@ -29,3 +33,13 @@ depends = ["common"]
 [linux.files]
 ".tmux.homelab.conf" = "~/.tmux.conf"
 ".config/nix" = "~/.config/nix"
+
+# Android, bez roota. Bootstrap: setup-termux.sh (zapisuje local.toml z packages = ["termux"])
+[termux]
+depends = ["common", "zsh"]
+
+[termux.files]
+".tmux.conf" = "~/.tmux.conf"
+".termux/termux.properties" = "~/.termux/termux.properties"
+".termux/colors.properties" = "~/.termux/colors.properties"
+".termux/termux-file-editor" = "~/bin/termux-file-editor"   # "Udostepnij -> Termux" na pliku

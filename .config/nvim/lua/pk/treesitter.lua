@@ -11,7 +11,11 @@
 local function gh(repo) return "https://github.com/" .. repo end
 
 vim.pack.add({ { src = gh("nvim-treesitter/nvim-treesitter"), version = "main" } })
-require("nvim-treesitter").install({ "python", "toml", "lua",
+-- Bez tree-sitter CLI (np. Termux bez `setup-termux.sh -t`) install() sypie
+-- bledem przy kazdym starcie. Wtedy zostaja parsery wbudowane w Neovim:
+-- lua, vim, vimdoc, query, markdown, c.
+local ts_can_build = vim.fn.executable("tree-sitter") == 1
+if ts_can_build then require("nvim-treesitter").install({ "python", "toml", "lua",
   "bash", "fish",
   "rust",
   "javascript", "typescript", "tsx",
@@ -20,7 +24,7 @@ require("nvim-treesitter").install({ "python", "toml", "lua",
   -- IaC
   "terraform", "hcl",   -- .tf/.tfvars oraz .hcl (packer, nomad, .terraform.lock.hcl)
   "gotmpl",             -- Go templates = to, co siedzi w {{ }} w szablonach Helma
-})
+}) end
 
 -- ---------------------------------------------------------------------------
 --  TERRAFORM
@@ -66,7 +70,7 @@ vim.api.nvim_create_autocmd("FileType", {
     if not lang then return end
     if vim.tbl_contains(require("nvim-treesitter").get_installed("parsers"), lang) then
       ts_attach(ev.buf, lang)
-    elseif vim.tbl_contains(ts_available, lang) then
+    elseif ts_can_build and vim.tbl_contains(ts_available, lang) then
       require("nvim-treesitter").install(lang):await(function() ts_attach(ev.buf, lang) end)
     else
       ts_attach(ev.buf, lang)   -- parser spoza nvim-treesitter (np. wbudowany w Neovim)
