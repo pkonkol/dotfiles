@@ -25,6 +25,7 @@
 	b = branch
 	p = pull --rebase
 	pu = push
+	ship = !git push origin HEAD:master && git fetch . HEAD:master
 [color]
 	ui=auto
 [gpg]

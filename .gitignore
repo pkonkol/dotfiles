@@ -8,3 +8,5 @@ pk-skills/
 
 # notatki robocze i klony do czytania (pk-collab: .scratch/ gitignorowany)
 .scratch/
+
+.DS_Store

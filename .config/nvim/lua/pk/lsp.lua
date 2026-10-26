@@ -32,7 +32,7 @@ vim.lsp.enable({
   "jsonls",              -- json
   "taplo",               -- toml: pyproject.toml, Cargo.toml
   "dockerls",            -- Dockerfile
-  "ts_ls",               -- typescript / tsx
+  "tsc",                 -- typescript / tsx: natywny TS 7 (tsc --lsp); starszy tsc z node_modules pomija
 })
 
 -- [markdown] alternatywa dla markdown_oxide — tylko JEDEN z dwoch naraz:
