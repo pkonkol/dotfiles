@@ -1,3 +1,7 @@
+# The following lines were added by Docker Desktop to add commands to your PATH.
+export PATH="$PATH:/Users/piotr.konkol/.docker/bin"
+# End of Docker Desktop section.
+
 # ============================================================================
 #  config.fish — CALY setup w jednym pliku.
 #  Zasada: kazdy bajer = jedna linia. Zakomentuj -> bajer znika.

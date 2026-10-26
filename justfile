@@ -3,6 +3,9 @@
 # os() w Termuksie to "android" (target Rusta), nie "linux"
 dotter_package := if os() == "macos" { "mac" } else if os() == "android" { "termux" } else if os() == "linux" { "linux" } else { error("nieobslugiwany system: " + os()) }
 
+# recepty pk-skills (just pk <recepta>), odpalane w pk-skills/; bez klonu modul jest pomijany
+mod? pk 'pk-skills/justfile'
+
 default:
     @just --list
 
