@@ -10,6 +10,14 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+if [[ -f "$HOME/.profile" ]]; then
+  source "$HOME/.profile"
+fi
+
+if [[ -f "$HOME/.zshrc.local" ]]; then
+  source "$HOME/.zshrc.local"
+fi
+
 # Skad pluginy: brew na macu, w Termuksie git clone z setup-termux.sh -z
 if [[ -d /opt/homebrew ]]; then
   BREW=/opt/homebrew
