@@ -26,6 +26,8 @@ depends = ["common", "zsh"]
 # pk-skills is a separate repo cloned here by setup-mac.sh -d (gitignored); Claude Code loads it as plugin pk@skills-dir
 "pk-skills" = { target = "~/.claude/skills/pk", type = "symbolic", recurse = false }
 "pk-skills/rules" = "~/.claude/rules"   # per-file links, other files in ~/.claude/rules stay untouched
+# whole dir: FlashSpace rewrites settings.json/profiles.json from the GUI, a per-file link could be replaced by a regular file
+".config/flashspace" = { target = "~/.config/flashspace", type = "symbolic", recurse = false }
 
 [linux]
 depends = ["common"]

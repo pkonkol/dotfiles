@@ -1,0 +1,166 @@
+{
+  "profiles" : [
+    {
+      "id" : "55F30D5D-3443-41E0-87B2-BDD8E55B7962",
+      "name" : "Default",
+      "workspaces" : [
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.microsoft.Outlook",
+              "iconPath" : "/Applications/Microsoft Outlook.app/Contents/Resources/Outlook_macOS.icns",
+              "name" : "Microsoft Outlook"
+            },
+            {
+              "bundleIdentifier" : "com.microsoft.teams2",
+              "iconPath" : "/Applications/Microsoft Teams.app/Contents/Resources/AppIcon.icns",
+              "name" : "Microsoft Teams"
+            },
+            {
+              "bundleIdentifier" : "com.tinyspeck.slackmacgap",
+              "iconPath" : "/Applications/Slack.app/Contents/Resources/electron.icns",
+              "name" : "Slack"
+            },
+            {
+              "bundleIdentifier" : "notion.id",
+              "iconPath" : "/Applications/Notion.app/Contents/Resources/electron.icns",
+              "name" : "Notion"
+            },
+            {
+              "bundleIdentifier" : "com.github.wez.wezterm",
+              "iconPath" : "/Applications/WezTerm.app/Contents/Resources/terminal.icns",
+              "name" : "WezTerm"
+            },
+            {
+              "bundleIdentifier" : "com.apple.clock",
+              "iconPath" : "/System/Applications/Clock.app/Contents/Resources/AppIcon.icns",
+              "name" : "Clock"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+1",
+          "display" : "LG ULTRAGEAR",
+          "id" : "984ECB69-6B1E-467B-9E21-2FFDCD061EA3",
+          "name" : "Komunikatory",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+1"
+        },
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.microsoft.VSCode",
+              "iconPath" : "/Applications/Visual Studio Code.app/Contents/Resources/Code.icns",
+              "name" : "Code"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+2",
+          "display" : "LG ULTRAGEAR",
+          "id" : "6D1B4F77-E613-4D8F-B7C1-AADDB111B401",
+          "name" : "VSCode",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+2"
+        },
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.google.Chrome",
+              "iconPath" : "/Applications/Google Chrome.app/Contents/Resources/app.icns",
+              "name" : "Google Chrome"
+            },
+            {
+              "bundleIdentifier" : "md.obsidian",
+              "iconPath" : "/Applications/Obsidian.app/Contents/Resources/icon.icns",
+              "name" : "Obsidian"
+            },
+            {
+              "bundleIdentifier" : "com.google.Chrome.app.bllfknnpemffioeamldafefcigbiiojf",
+              "iconPath" : "/Users/piotr.konkol/Applications/Chrome Apps.localized/Google.app/Contents/Resources/app.icns",
+              "name" : "Google"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+3",
+          "display" : "LG ULTRAGEAR",
+          "id" : "97A98BD1-94A4-4BDA-BADA-7E080D5C6B95",
+          "name" : "Przegladarka",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+3"
+        },
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.anthropic.claudefordesktop",
+              "iconPath" : "/Applications/Claude.app/Contents/Resources/electron.icns",
+              "name" : "Claude"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+4",
+          "display" : "LG ULTRAGEAR",
+          "id" : "E160AA1D-D727-4433-9870-70AF96B30B8E",
+          "name" : "Claude",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+4"
+        },
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.google.Chrome.app.agimnkijcaahngcdmfeangaknmldooml",
+              "iconPath" : "/Users/piotr.konkol/Applications/Chrome Apps.localized/YouTube.app/Contents/Resources/app.icns",
+              "name" : "YouTube"
+            },
+            {
+              "bundleIdentifier" : "com.google.Chrome.app.cinhimbnkkaeohfgghhklpknlkffjgod",
+              "iconPath" : "/Users/piotr.konkol/Applications/Chrome Apps.localized/YouTube Music.app/Contents/Resources/app.icns",
+              "name" : "YouTube Music"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+5",
+          "display" : "LG ULTRAGEAR",
+          "id" : "27942EBF-CD02-4EE2-8123-1C4C8FF0F6C6",
+          "name" : "Muzyka",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+5"
+        },
+        {
+          "apps" : [
+            {
+              "bundleIdentifier" : "com.microsoft.Word",
+              "iconPath" : "/Applications/Microsoft Word.app/Contents/Resources/Word_macOS.icns",
+              "name" : "Microsoft Word"
+            },
+            {
+              "bundleIdentifier" : "com.microsoft.Powerpoint",
+              "iconPath" : "/Applications/Microsoft PowerPoint.app/Contents/Resources/Powerpoint_macOS.icns",
+              "name" : "Microsoft PowerPoint"
+            },
+            {
+              "bundleIdentifier" : "com.microsoft.Excel",
+              "iconPath" : "/Applications/Microsoft Excel.app/Contents/Resources/Excel_macOS.icns",
+              "name" : "Microsoft Excel"
+            },
+            {
+              "bundleIdentifier" : "com.apple.Pages",
+              "iconPath" : "/Applications/Pages Creator Studio.app/Contents/Resources/AppIcon.icns",
+              "name" : "Pages"
+            }
+          ],
+          "assignAppShortcut" : "ctrl+shift+6",
+          "display" : "LG ULTRAGEAR",
+          "id" : "DC0185B1-4291-4752-9E01-D16327DF2B18",
+          "name" : "Dokumenty",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+6"
+        },
+        {
+          "apps" : [
+
+          ],
+          "assignAppShortcut" : "ctrl+shift+7",
+          "display" : "LG ULTRAGEAR",
+          "id" : "DFB8B3B4-C9A9-45D9-AF79-FF10C453AB41",
+          "name" : "slop",
+          "openAppsOnActivation" : false,
+          "shortcut" : "ctrl+7"
+        }
+      ]
+    }
+  ]
+}
