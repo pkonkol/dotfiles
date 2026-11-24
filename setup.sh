@@ -73,6 +73,7 @@ main() {
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
         export PATH="$HOME/.local/bin:$PATH"   # tu laduja uv, mise i dotter z -d
+        # linux (homelab) is never a work machine, so no question about the dotter package "work"
         [[ -f .dotter/local.toml ]] || echo 'packages = ["linux"]' > .dotter/local.toml
         dotter deploy
     fi

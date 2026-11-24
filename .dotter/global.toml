@@ -31,6 +31,10 @@ depends = ["common", "zsh"]
 # whole dir: FlashSpace rewrites settings.json/profiles.json from the GUI, a per-file link could be replaced by a regular file
 ".config/flashspace" = { target = "~/.config/flashspace", type = "symbolic", recurse = false }
 
+# work machine, next to the OS package in local.toml: strongest model for pk phases
+[work.files]
+".config/pk/config.json" = "~/.config/pk/config.json"
+
 [linux]
 depends = ["common"]
 

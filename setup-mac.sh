@@ -201,8 +201,7 @@ main() {
     fi
 
     if [[ ${DEPLOY_DOTFILES:-0} -eq 1 ]]; then
-        [[ -f .dotter/local.toml ]] || echo 'packages = ["mac"]' > .dotter/local.toml
-        dotter deploy
+        just deploy --apply
     fi
 }
 
