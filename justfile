@@ -9,20 +9,20 @@ mod? pk 'pk-skills/justfile'
 default:
     @just --list
 
-# symlinki z .dotter/global.toml do $HOME (dry-run; `just deploy --apply` wykonuje)
-deploy apply="": _dotter-local
+# symlinki z .dotter/global.toml do $HOME (dry-run; `just deploy --apply` wykonuje); pierwszy raz pyta o maszyne robocza
+deploy apply="": _ensure-dotter-local
     dotter deploy -v {{ if apply == "--apply" { "" } else { "--dry-run" } }}
 
 # zaklada .dotter/local.toml: pakiet systemu i, na maszynie roboczej, pakiet work
 [private]
-_dotter-local:
+_ensure-dotter-local:
     #!/usr/bin/env bash
     set -euo pipefail
     [[ -f .dotter/local.toml ]] && exit 0
     # EOF (no terminal, Ctrl-D) counts as the default answer "no"
     read -r -p "maszyna robocza (pakiet work: najmocniejszy model w pk)? [t/N] " is_work_machine || is_work_machine=""
     packages='"{{ dotter_package }}"'
-    if [[ $is_work_machine == [tT] ]]; then
+    if [[ $is_work_machine == [tTyY]* ]]; then
         packages+=', "work"'
     fi
     echo "packages = [$packages]" > .dotter/local.toml
