@@ -76,6 +76,10 @@
       "rev": "ae584b8320c6e74bd37ca908e45026163c086628",
       "src": "https://github.com/srcery-colors/srcery-vim"
     },
+    "statuscol.nvim": {
+      "rev": "887b8a03ea3804628505c9002fd07bd06a3db2e0",
+      "src": "https://github.com/luukvbaal/statuscol.nvim"
+    },
     "tokyonight.nvim": {
       "rev": "cdc07ac78467a233fd62c493de29a17e0cf2b2b6",
       "src": "https://github.com/folke/tokyonight.nvim"

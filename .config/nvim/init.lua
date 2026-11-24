@@ -35,6 +35,9 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 2  -- na starcie wszystko (nie)rozwinięte
+-- Kolumna ze strzalkami foldow, klikalna mysza (jak w VS Code); rysuje ja pk/statuscol.lua
+vim.o.foldcolumn = "1"
+vim.opt.fillchars:append({ foldopen = "\u{f078}", foldclose = "\u{f054}", foldsep = " ", fold = " " })
 
 -- ===========================================================================
 --  SKROTY PODSTAWOWE — z kickstart.nvim
@@ -123,6 +126,7 @@ require("pk.flash")            -- [6] s skok, S wezel treesittera, r remote
 require("pk.yanky")            -- [Y] p, potem <C-p>/<C-n>
 require("pk.dial")             -- [D] <C-a>/<C-x> tez na datach, true/false, [ ]/[x]
 require("pk.neo_tree")         -- [E]
+require("pk.statuscol")        -- [S] klikalna lewa kolumna: foldy, bledy, git
 -- require("pk.lsp_attach")    -- [L]
 -- require("pk.blink")         -- [8]
 -- require("pk.conform")       -- [9]
